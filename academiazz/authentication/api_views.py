@@ -48,6 +48,7 @@ def login_api(request):
         "access": str(refresh.access_token),
         "refresh": str(refresh),
         "role": refresh["role"],
+        "username": user.username
     })
 
 class UserViewSet(viewsets.ModelViewSet):

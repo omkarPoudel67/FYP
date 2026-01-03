@@ -6,6 +6,9 @@ import StudentDashboard from './pages/StudentDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from './pages/ResetPassword';
+import FaceLogin from './pages/FaceLogin';
+import Profile from './pages/Profile';
+
 
 
 
@@ -20,6 +23,8 @@ function App() {
         <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
+        <Route path="/face-login" element={<FaceLogin />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );

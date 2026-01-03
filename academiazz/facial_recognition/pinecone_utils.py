@@ -37,5 +37,23 @@ def init_pinecone_index(api_key, index_name="face-embeddings", dimension=512, cl
         )
     return pc.Index(index_name)
 
-def store_embedding(index, user_id, embedding):
+def store_embedding(user_id, embedding):
     index.upsert([(str(user_id), embedding.tolist())])
+
+
+def find_best_match(index, embedding, threshold=0.6):
+    result = index.query(
+        vector=embedding.tolist(),
+        top_k=1
+    )
+
+    if not result["matches"]:
+        return False, None, 0.0
+
+    match = result["matches"][0]
+    score = match["score"]
+
+    if score >= threshold:
+        return True, match["id"], score
+
+    return False, None, score

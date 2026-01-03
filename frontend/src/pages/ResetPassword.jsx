@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
-import "./CSS/ResetPassword.css"; // We'll style the box here
+import "./CSS/ResetPassword.css"; 
 
 export default function ResetPassword() {
   const { userId, token } = useParams();

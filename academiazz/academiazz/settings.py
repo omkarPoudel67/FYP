@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'students',
     'rest_framework',
     'corsheaders',
+    'facial_recognition'
 ]
 
 MIDDLEWARE = [

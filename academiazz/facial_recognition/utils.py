@@ -6,13 +6,11 @@ import numpy as np
 from pinecone import Pinecone, ServerlessSpec
 import os
 
-# 1. Initialize InsightFace model (run once)
 def init_face_model():
     model = insightface.app.FaceAnalysis(name="buffalo_l")
     model.prepare(ctx_id=0)  # 0 = GPU, -1 = CPU
     return model
 
-# 2. Capture image from file or webcam
 def read_image(image_path=None, from_webcam=False):
     if from_webcam:
         cap = cv2.VideoCapture(0)
@@ -27,8 +25,8 @@ def read_image(image_path=None, from_webcam=False):
             raise Exception(f"Failed to read image from {image_path}")
         return img
 
-# 3. Extract embedding from image
-def get_face_embedding(model, img):
+def get_face_embedding(img):
+    model = init_face_model()
     faces = model.get(img)
     if len(faces) == 0:
         return None

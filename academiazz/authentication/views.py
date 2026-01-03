@@ -11,13 +11,11 @@ from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.http import JsonResponse
 import json
-#from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.tokens import default_token_generator
 
 
 

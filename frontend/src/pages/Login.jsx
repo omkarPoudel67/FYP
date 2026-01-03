@@ -12,6 +12,10 @@ export default function Login() {
   const [showForgot, setShowForgot] = useState(false);
   const navigate = useNavigate();
 
+  const goToFaceLogin = () => {
+  navigate("/face-login");
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = await loginUser(username, password);
@@ -21,8 +25,7 @@ export default function Login() {
       localStorage.setItem("refresh", data.refresh);
 
       if (data.role == "student"){
-                navigate("/student-dashboard");
-            }
+                navigate("/student-dashboard", { state: { username: data.username } });            }
             else if (data.role == "teacher"){
                 navigate("/teacher-dashboard");
             }
@@ -70,7 +73,7 @@ export default function Login() {
 
         <div className="divider">OR</div>
 
-        <button className="webcam-btn">Login via Webcam 📷</button>
+        <button className="webcam-btn" onClick={goToFaceLogin}>Login via Webcam 📷</button>
 
         {error && <p className="error">{error}</p>}
       </div>

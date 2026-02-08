@@ -11,7 +11,7 @@ api_key = os.getenv("PINECONE_API_KEY")
 print(api_key)
 pc = Pinecone(api_key=api_key)
 
-# Create or connect to an index
+
 index_name = "face-embeddings"
 
 if index_name not in pc.list_indexes().names():
@@ -19,7 +19,7 @@ if index_name not in pc.list_indexes().names():
         name=index_name,
         dimension=512,  # ArcFace embeddings
         metric="cosine",  # similarity metric
-        spec=ServerlessSpec(cloud="aws", region="us-east-1")  # change region if needed
+        spec=ServerlessSpec(cloud="aws", region="us-east-1")  
     )
 
 # Connect to the index

@@ -147,3 +147,15 @@ def reset_password(request):
     user.save()
 
     return Response({"success": "Password reset successful"})
+
+
+def test_view(request):
+    """
+    Simple test view to verify API is working
+    """
+    return HttpResponse({
+        "message": "Test view is working!",
+        "method": request.method,
+        "success": True
+    })
+

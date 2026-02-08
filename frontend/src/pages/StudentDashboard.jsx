@@ -1,11 +1,32 @@
-import React from "react";
-import "./CSS/StudentDashboard.css"; 
+import React, { useEffect, useState } from "react";
+import "./CSS/StudentDashboard.css";
 import Sidebar from "./Sidebar";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/authcontext";
+import axios from "axios";
+import useStudentData from "../RetriveData";
+import { useModules } from "../RetriveData";
+import { useWeeks } from "../RetriveData";
+import { useResources } from "../RetriveData";
+import { useSchedules } from "../RetriveData";
+import { useAnnouncements } from "../RetriveData";
+
 
 
 export default function StudentDashboard() {
+  
+  const { studentData, loading, error } = useStudentData();
+  const { modules, loading: modulesLoading, error: modulesError } = useModules(studentData?.group);
+  const { weeks, loading: weeksLoading, error: weeksError } = useWeeks(modules?.modules?.[0]);
+  const { resources, loading: resourcesLoading, error: resourcesError } = useResources(modules?.modules?.[0], weeks?.[0]);
+  const { schedules, scheduleLoading, scheduleError } = useSchedules(studentData?.group);
+  const { announcements, AnnounceLoading, AnnounceError } = useAnnouncements();
+
   const navigate = useNavigate();
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Unauthorized</div>;
+
   return (
     <div className="dashboard-container">
       <Sidebar />
@@ -50,7 +71,7 @@ export default function StudentDashboard() {
               <div className="event-details">
                 <h4 className="event-title">Project Submission Deadline Extended</h4>
                 <p className="event-description">The deadline for Project Guidelines submission has been extended to September 30th.</p>
-                <p className="event-meta">Posted by: Dr. Sujan Uprety • 2 hours ago</p>
+                <p className="event-meta">Posted by: Sujan Uprety • 2 hours ago</p>
               </div>
             </div>
             <div className="event-item">
@@ -131,7 +152,7 @@ export default function StudentDashboard() {
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="#14b8a6">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                       </svg>
-                      Dr. Uprety
+                       Uprety
                     </span>
                     <span className="class-detail-compact">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="#14b8a6">

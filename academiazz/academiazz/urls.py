@@ -22,5 +22,9 @@ urlpatterns = [
     path('auth/', include('authentication.urls')),
     path('api/', include('authentication.api_urls')), 
     path("api/facial-recognition/", include("facial_recognition.urls")),
+    path('api/students/', include('students.urls')),
+    path('resources/', include('resources.urls')),
+    path('schedule/', include('schedules.urls')),
+    path('announcements/', include('announcements.urls'))
 
 ]

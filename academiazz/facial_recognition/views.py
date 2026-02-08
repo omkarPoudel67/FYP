@@ -83,8 +83,8 @@ def face_login(request):
         # Catch all unexpected errors and return JSON
         return JsonResponse({"success": False, "message": f"Unexpected error: {str(e)}"}, status=500)
 
-@api_view(["POST"])
 
+@api_view(["POST"])
 def face_register(request):
     try:
         user = request.user  # logged-in student

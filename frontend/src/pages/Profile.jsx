@@ -1,7 +1,9 @@
 import React, { useState, useRef } from "react";
+import { useAuth } from "../context/authcontext";
 import "./CSS/Profile.css";
 
 const Profile = () => {
+  const { accessToken, setAccessToken, api, refreshAccessToken } = useAuth();
   const videoRef = useRef(null);
   const [facialDataStatus, setFacialDataStatus] = useState(false);
   const [error, setError] = useState("");
@@ -39,16 +41,21 @@ const Profile = () => {
     const formData = new FormData();
     formData.append("image", blob, "face.jpg");
 
-    try {
-      const res = await fetch("http://127.0.0.1:8000/api/facial-recognition/face-register/", {
-        method: "POST",
-        headers: {
-         
-        },
-        body: formData,
-      });
+    try 
+      {
+      // Use Axios with headers
+      const res = await api.post(
+        "/api/facial-recognition/face-register/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+          },
+        }
+      );
 
-      const data = await res.json();
+      const data = await res.data;
       if (data.success) {
         setFacialDataStatus(true);
         alert("Face enrolled successfully!");

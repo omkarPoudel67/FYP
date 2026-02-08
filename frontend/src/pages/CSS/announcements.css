@@ -1,0 +1,363 @@
+/* Announcements Page Styles */
+.announcements-page {
+  margin-left: 30px;
+  min-height: 100vh;
+  background: #f5f6fa;
+  display: flex;
+}
+
+.announcements-content {
+  margin-left: 240px;
+  padding: 30px;
+  width: 100%;
+  max-width: calc(100% - 240px);
+  box-sizing: border-box;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+/* Header with Stats */
+.announcements-header {
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-left {
+  flex: 1;
+}
+
+.announcements-title {
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.announcements-subtitle {
+  color: #666;
+  font-size: 16px;
+}
+
+/* Stats in Header (Top Right) */
+.header-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.stat-badge {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  min-width: 160px;
+}
+
+.stat-icon {
+  width: 36px;
+  height: 36px;
+  background: #e8f7f5;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #14b8a6;
+  font-size: 18px;
+}
+
+.stat-info h4 {
+  margin: 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stat-info p {
+  margin: 4px 0 0;
+  color: #666;
+  font-size: 12px;
+}
+
+/* Announcements List - VERTICAL LAYOUT */
+.announcements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 40px;
+}
+
+/* Announcement Item */
+.announcement-item {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  border-left: 4px solid transparent;
+}
+
+.announcement-item:hover {
+  transform: translateX(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* Hover Spotlight Effect */
+.announcement-item:hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.08) 0%, rgba(20, 184, 166, 0.02) 100%);
+  z-index: 0;
+}
+
+.announcement-item:hover {
+  border-left-color: #14b8a6;
+}
+
+/* Latest Announcement - Special Style */
+.latest-item {
+  border-left: 4px solid #14b8a6;
+  background: #f8fbfb;
+}
+
+.latest-item:hover {
+  border-left-color: #0fa293;
+  background: #f0f9f8;
+}
+
+.latest-item:hover::before {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(20, 184, 166, 0.05) 100%);
+}
+
+/* Latest Badge */
+.latest-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #14b8a6;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+/* Card Content */
+.card-content {
+  padding: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.announcement-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  flex: 1;
+  line-height: 1.4;
+}
+
+.latest-item .announcement-title {
+  font-size: 20px;
+  color: #222;
+}
+
+.announcement-date {
+  color: #14b8a6;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e8f7f5;
+  padding: 6px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+  margin-left: 16px;
+}
+
+.latest-item .announcement-date {
+  font-size: 13px;
+  padding: 7px 14px;
+}
+
+/* Announcement Description */
+.announcement-description {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.latest-item .announcement-description {
+  color: #555;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* Card Footer */
+.announcement-footer {
+  padding-top: 16px;
+  border-top: 1px solid #f0f5f4;
+}
+
+.time-posted {
+  color: #777;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-icon {
+  color: #14b8a6;
+}
+
+/* Loading States */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid #e8f7f5;
+  border-top: 4px solid #14b8a6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+.loading-text {
+  color: #666;
+  font-size: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error States */
+.error-container {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  color: #ff6b6b;
+}
+
+.error-message {
+  color: #333;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.error-details {
+  color: #666;
+  font-size: 14px;
+}
+
+/* Empty State */
+.empty-state {
+  background: #fff;
+  border-radius: 16px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+  color: #ddd;
+}
+
+.empty-title {
+  color: #666;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.empty-description {
+  color: #999;
+  font-size: 16px;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .announcements-content {
+    margin-left: 0;
+    max-width: 100%;
+    padding: 20px;
+  }
+  
+  .announcements-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .header-stats {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .card-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .announcement-date {
+    margin-left: 0;
+    align-self: flex-start;
+  }
+  
+  .latest-badge {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin-bottom: 12px;
+    display: inline-block;
+  }
+  
+  .header-stats {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .stat-badge {
+    min-width: 100%;
+  }
+}

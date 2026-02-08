@@ -4,8 +4,12 @@ import { loginUser } from "../auth";
 import ForgotPassword from "./ForgotPassword";
 import "./CSS/Login.css";
 import loginImage from "../public/login.jpg";
+import { useAuth } from "../context/authcontext.jsx";
+const BASE_URL = "http://localhost:8000/api";
+import axios from 'axios';
 
 export default function Login() {
+  const { setAccessToken } = useAuth(); 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,28 +19,34 @@ export default function Login() {
   const goToFaceLogin = () => {
   navigate("/face-login");
 };
+  const api = axios.create({
+    baseURL: BASE_URL,
+    withCredentials: true, // include cookies if needed
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const data = await loginUser(username, password);
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (data.success) {
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
 
-      if (data.role == "student"){
-                navigate("/student-dashboard", { state: { username: data.username } });            }
-            else if (data.role == "teacher"){
-                navigate("/teacher-dashboard");
-            }
-            else{
-                setError(data.message || "Login failed")
-            }
-    }
-    else {
+  const data = await loginUser(username, password);
+  
+  if (data.success) {
+    
+    setAccessToken(data.access);
+
+    
+    if (data.role === "student") {
+      api.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
+      navigate("/student-dashboard", { state: { username: data.username } });
+    } else if (data.role === "teacher") {
+      navigate("/teacher-dashboard");
+    } else {
       setError(data.message || "Login failed");
     }
-  };
+  } else {
+    setError(data.message || "Login failed");
+  }
+};
 
   return (
     <div className="login-page">

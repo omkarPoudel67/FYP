@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,6 +46,8 @@ INSTALLED_APPS = [
     'teachers',
     'students',
     'rest_framework',
+    'rest_framework_simplejwt',
+    'announcements',
     'corsheaders',
     'facial_recognition'
 ]
@@ -135,7 +139,17 @@ AUTH_USER_MODEL = 'authentication.User'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
-from corsheaders.defaults import default_headers
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SECURE = False  
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SECURE = False
+
+
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "Authorization",
 ]
@@ -145,8 +159,12 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny',  # open by default
+        'rest_framework.permissions.IsAuthenticated',
     ),
+}
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

@@ -14,87 +14,169 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showForgot, setShowForgot] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const goToFaceLogin = () => {
-  navigate("/face-login");
-};
+    navigate("/face-login");
+  };
+  
   const api = axios.create({
     baseURL: BASE_URL,
-    withCredentials: true, // include cookies if needed
+    withCredentials: true,
   });
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-
-  const data = await loginUser(username, password);
-  
-  if (data.success) {
+    const data = await loginUser(username, password);
     
-    setAccessToken(data.access);
-
-    
-    if (data.role === "student") {
-      api.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
-      navigate("/student-dashboard", { state: { username: data.username } });
-    } else if (data.role === "teacher") {
-      navigate("/teacher-dashboard");
+    if (data.success) {
+      setAccessToken(data.access);
+      
+      if (data.role === "student") {
+        api.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
+        navigate("/student-dashboard", { state: { username: data.username } });
+      } else if (data.role === "teacher") {
+        navigate("/teacher-dashboard");
+      } else {
+        setError(data.message || "Login failed");
+        setIsLoading(false);
+      }
     } else {
       setError(data.message || "Login failed");
+      setIsLoading(false);
     }
-  } else {
-    setError(data.message || "Login failed");
-  }
-};
+  };
 
   return (
     <div className="login-page">
-      <div className="logo">academiazz</div>
+      <div className="logo">
+        <span className="logo-text">academiazz</span>
+        <span className="logo-dot"></span>
+      </div>
 
       <div className="login-left">
-        <h2>Login</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button type="submit">Login</button>
-        </form>
+        <div className="login-left-content">
+          <div className="welcome-section">
+            <h2>Welcome Back! </h2>
+            <p className="welcome-subtitle">Please enter your details to sign in</p>
+          </div>
 
-        <div className="login-links">
-          <span
-            style={{ cursor: "pointer", color: "#8b5cf6", textDecoration: "underline" }}
-            onClick={() => setShowForgot(true)}
-          >
-            Forgot Password?
-          </span>
+          <form onSubmit={handleSubmit} className="login-form">
+            <div className="input-group">
+              <label htmlFor="username">Username</label>
+              <div className="input-wrapper">
+                <svg className="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                <input
+                  type="text"
+                  id="username"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="password">Password</label>
+              <div className="input-wrapper">
+                <svg className="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-options">
+              <div className="remember-me">
+                <input type="checkbox" id="remember" />
+                <label htmlFor="remember">Remember me</label>
+              </div>
+              <span
+                className="forgot-link"
+                onClick={() => setShowForgot(true)}
+              >
+                Forgot Password?
+              </span>
+            </div>
+
+            <button 
+              type="submit" 
+              className={`login-btn ${isLoading ? 'loading' : ''}`}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <span className="spinner"></span>
+                  Signing in...
+                </>
+              ) : (
+                'Sign in'
+              )}
+            </button>
+          </form>
+
+          <div className="divider">
+            <span>or continue with</span>
+          </div>
+
+          <button className="webcam-btn" onClick={goToFaceLogin}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 3H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+            Login via Webcam
+          </button>
+
+          <div className="signup-prompt">
+            <p>Don't have an account? <a href="/signup">Sign up</a></p>
+          </div>
+
+          {error && (
+            <div className="error-message">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <path d="M12 8V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <circle cx="12" cy="16" r="1" fill="currentColor"/>
+              </svg>
+              <p>{error}</p>
+            </div>
+          )}
         </div>
-
-        <div className="divider">OR</div>
-
-        <button className="webcam-btn" onClick={goToFaceLogin}>Login via Webcam 📷</button>
-
-        {error && <p className="error">{error}</p>}
       </div>
 
       <div className="login-right">
+        <div className="image-overlay"></div>
         <img src={loginImage} alt="Education" />
-        <h2>
-          “Education is the most powerful weapon which you can use to change
-          the world.”
-        </h2>
-        <p>– Nelson Mandela</p>
+        <div className="quote-container">
+          <svg className="quote-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 11H6V15H10V11Z" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M18 11H14V15H18V11Z" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M10 11V9C10 7.89543 10.8954 7 12 7" stroke="white" strokeWidth="2"/>
+            <path d="M18 11V9C18 7.89543 17.1046 7 16 7" stroke="white" strokeWidth="2"/>
+          </svg>
+          <h2>
+            “Education is the most powerful weapon which you can use to change
+            the world.”
+          </h2>
+          <p>– Nelson Mandela</p>
+          <div className="quote-decoration"></div>
+        </div>
       </div>
 
       <ForgotPassword show={showForgot} onClose={() => setShowForgot(false)} />

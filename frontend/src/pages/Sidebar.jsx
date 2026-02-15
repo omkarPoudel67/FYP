@@ -3,9 +3,11 @@ import axios from 'axios';
 import './CSS/Sidebar.css';
 import { useAuth } from '../context/authcontext.jsx';
 import { useNavigate } from "react-router-dom";
+import useStudentData  from '../RetriveData.jsx';
 
 
 const Sidebar = () => {
+  const { data, error, loading } = useStudentData();
   const { setAccessToken } = useAuth(); 
   const BASE_URL = "http://localhost:8000/api";
   const navigate = useNavigate();

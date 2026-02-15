@@ -10,7 +10,6 @@ from facial_recognition.pinecone_utils import init_pinecone_index, find_best_mat
 from dotenv import load_dotenv
 from rest_framework.decorators import api_view
 
-
 from rest_framework_simplejwt.tokens import RefreshToken
 
 load_dotenv("../.env")
@@ -59,25 +58,32 @@ def face_login(request):
         except User.DoesNotExist:
             return JsonResponse({"success": False, "message": "User not found"}, status=404)
 
-        try:
-            refresh = RefreshToken.for_user(user)
-            if hasattr(user, "students"):
-                refresh["role"] = "student"
-            else:
-                refresh["role"] = "teacher"
-        except Exception as e:
-            return JsonResponse({"success": False, "message": f"JWT generation failed: {str(e)}"}, status=500)
+        refresh = RefreshToken.for_user(user)
+        access = refresh.access_token
 
-        return JsonResponse({
+        if user.is_superuser == True:
+            role = 'teacher'
+        else:
+            role = 'student'
+
+
+        response = JsonResponse({
             "success": True,
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
-            "role": refresh["role"],
-            "user_id": user_id,
-            "score": score,
+            "access": str(access),
             "username": user.username,
-            
+            "role": role
         })
+
+        response.set_cookie(
+            key="refresh_token",
+            value=str(refresh),
+            httponly=True,
+            secure=False,      
+            samesite="Lax",
+            max_age=7 * 24 * 60 * 60  # 7 days
+        )
+
+        return response
 
     except Exception as e:
         # Catch all unexpected errors and return JSON

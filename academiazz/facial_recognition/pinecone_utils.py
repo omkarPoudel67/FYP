@@ -4,7 +4,7 @@ from pinecone import Pinecone, ServerlessSpec
 import numpy as np
 
 
-load_dotenv("../.env") 
+load_dotenv("../vars/.env") 
 
 
 api_key = os.getenv("PINECONE_API_KEY")

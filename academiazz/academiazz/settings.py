@@ -174,5 +174,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'omkarpoudel06@gmail.com'
 EMAIL_HOST_PASSWORD = 'tlhu rmwb xjel xfzu' 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+TIME_ZONE = 'Asia/Kathmandu'
+USE_TZ = True
+
+
 from django.core.mail import send_mail
 from django.conf import settings

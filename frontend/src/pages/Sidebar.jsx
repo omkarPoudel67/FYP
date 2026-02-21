@@ -1,16 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './CSS/Sidebar.css';
 import { useAuth } from '../context/authcontext.jsx';
-import { useNavigate } from "react-router-dom";
-import useStudentData  from '../RetriveData.jsx';
-
+import { useNavigate, useLocation } from "react-router-dom";
+import useStudentData from '../RetriveData.jsx';
 
 const Sidebar = () => {
-  const { data, error, loading } = useStudentData();
+  const { studentData, error, loading } = useStudentData();
   const { setAccessToken } = useAuth(); 
   const BASE_URL = "http://localhost:8000/api";
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (studentData) {
+      console.log("Sidebar received student data:", studentData);
+    }
+  }, [studentData]);
+
+  useEffect(() => {
+    if (error) {
+      console.error("Error in sidebar:", error);
+    }
+  }, [error]);
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -29,9 +41,13 @@ const Sidebar = () => {
 
   const handleItemClick = async (id) => {
     if (id === "logout") {
-      await axios.post(`${BASE_URL}/logout/`, {}, { withCredentials: true });
-      setAccessToken(null);
-      navigate("/");
+      try {
+        await axios.post(`${BASE_URL}/logout/`, {}, { withCredentials: true });
+        setAccessToken(null);
+        navigate("/");
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
       return;
     }
 
@@ -44,9 +60,66 @@ const Sidebar = () => {
       case "dashboard": navigate("/student-dashboard"); break;
       default: console.warn("No route defined for:", id);
     }
-
   };
-  
+
+  // Get initials for avatar
+  const getInitials = () => {
+    if (studentData?.user?.first_name && studentData?.user?.last_name) {
+      return `${studentData.user.first_name[0]}${studentData.user.last_name[0]}`;
+    }
+    return "U";
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="sidebar">
+        <div className="sidebar-logo">
+          <div className="logo-circle">
+            <span className="logo-text">A</span>
+          </div>
+          <h2 className="logo-title">Academiaz</h2>
+        </div>
+        <div className="sidebar-profile">
+          <div className="profile-avatar">
+            <div className="avatar-circle">
+              <span className="avatar-initials">...</span>
+            </div>
+          </div>
+          <div className="profile-info">
+            <h4 className="profile-name">Loading...</h4>
+            <p className="profile-role">Loading...</p>
+            <p className="profile-id">ID: Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="sidebar">
+        <div className="sidebar-logo">
+          <div className="logo-circle">
+            <span className="logo-text">A</span>
+          </div>
+          <h2 className="logo-title">Academiaz</h2>
+        </div>
+        <div className="sidebar-profile">
+          <div className="profile-avatar">
+            <div className="avatar-circle">
+              <span className="avatar-initials">!</span>
+            </div>
+          </div>
+          <div className="profile-info">
+            <h4 className="profile-name">Error loading profile</h4>
+            <p className="profile-role">Please try again</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="sidebar">
@@ -58,17 +131,25 @@ const Sidebar = () => {
         <h2 className="logo-title">Academiaz</h2>
       </div>
 
-      {/* User Profile Section */}
+      {/* Profile Section - Using sidebar-profile class */}
       <div className="sidebar-profile">
         <div className="profile-avatar">
           <div className="avatar-circle">
-            <span className="avatar-initials">OP</span>
+            <span className="avatar-initials">{getInitials()}</span>
           </div>
         </div>
         <div className="profile-info">
-          <h4 className="profile-name">Omkar Poudel</h4>
-          <p className="profile-role">Student</p>
-          <p className="profile-id">ID: 2419194</p>
+          {studentData ? (
+            <>
+              <h4 className="profile-name">
+                {studentData.user?.first_name || ''} {studentData.user?.last_name || ''}
+              </h4>
+              <p className="profile-role">{studentData.role || 'Student'}</p>
+              <p className="profile-id">ID: {studentData.user?.id || 'N/A'}</p>
+            </>
+          ) : (
+            <h4 className="profile-name">No data available</h4>
+          )}
         </div>
       </div>
 

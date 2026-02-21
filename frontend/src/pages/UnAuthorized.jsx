@@ -56,7 +56,7 @@ const Unauthorized401 = () => {
           onMouseOver={(e) => (e.target.style.backgroundColor = "#c0392b")}
           onMouseOut={(e) => (e.target.style.backgroundColor = "#e74c3c")}
         >
-          Go to Home
+          Go to Login Page
         </a>
       </div>
     </div>

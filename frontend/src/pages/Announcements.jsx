@@ -51,7 +51,7 @@ const Events = () => {
           {!AnnounceLoading && !AnnounceError && announcements.length > 0 && (
             <div className="header-stats">
               <div className="stat-badge">
-                <div className="stat-icon">📢</div>
+                {/* <div className="stat-icon"></div> */}
                 <div className="stat-info">
                   <h4>{announcements.length}</h4>
                   <p>Total Announcements</p>

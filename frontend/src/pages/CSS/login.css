@@ -273,13 +273,13 @@ body {
 }
 
 .login-btn:hover:not(.loading) {
-  transform: translateY(-2px);
+  transform: translateY(-5px);
   box-shadow: 0 12px 20px rgba(20, 184, 166, 0.3);
 }
 
 .login-btn:hover:not(.loading)::before {
-  width: 300px;
-  height: 300px;
+  width: 500px;
+  height: 500px;
 }
 
 .login-btn:active:not(.loading) {
@@ -373,8 +373,8 @@ body {
 }
 
 .webcam-btn:hover::before {
-  width: 300px;
-  height: 300px;
+  width: 500px;
+  height: 500px;
 }
 
 .webcam-btn:active {
@@ -479,14 +479,13 @@ body {
   max-width: 500px;
   padding: 30px;
   background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
+  /* backdrop-filter: blur(10px); */ 
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   margin: 0 30px;
   animation: fadeInUp 0.8s ease;
   text-align: left;
 }
-
 .quote-icon {
   margin-bottom: 20px;
   opacity: 0.8;

@@ -45,7 +45,6 @@ const Resources = () => {
       {/* MODULE SELECT CARD */}
       <div className="selection-card">
         <div className="card-title">
-          <div className="card-icon">📚</div>
           <span>Select Module</span>
         </div>
         <select
@@ -71,7 +70,6 @@ const Resources = () => {
         )}
         {modulesError && (
           <div className="error-state">
-            <span className="error-icon">⚠️</span>
             <span>{modulesError}</span>
           </div>
         )}
@@ -81,7 +79,6 @@ const Resources = () => {
       {selectedModule && (
         <div className="selection-card">
           <div className="card-title">
-            <div className="card-icon">📅</div>
             <span>Select Week</span>
           </div>
           <select
@@ -104,7 +101,6 @@ const Resources = () => {
           )}
           {weeksError && (
             <div className="error-state">
-              <span className="error-icon">⚠️</span>
               <span>{weeksError}</span>
             </div>
           )}
@@ -137,14 +133,12 @@ const Resources = () => {
           
           {resourcesError && (
             <div className="error-state" style={{ margin: "20px 0" }}>
-              <span className="error-icon">⚠️</span>
               <span>{resourcesError}</span>
             </div>
           )}
 
           {resources?.length === 0 && !resourcesLoading && !resourcesError && (
             <div className="empty-resources">
-              <div className="empty-icon">📄</div>
               <p className="empty-message">No resources available for this week</p>
               <p className="empty-hint">Check back later or contact your instructor</p>
             </div>
@@ -164,11 +158,9 @@ const Resources = () => {
               <div className="resource-footer">
                 <div className="resource-meta">
                   <div className="meta-item">
-                    <span className="meta-icon">📄</span>
                     <span>{res.file?.split('.').pop()?.toUpperCase() || 'Unknown'}</span>
                   </div>
                   <div className="meta-item">
-                    <span className="meta-icon">📅</span>
                     <span>Week {selectedWeek}</span>
                   </div>
                 </div>
@@ -179,7 +171,6 @@ const Resources = () => {
                   rel="noopener noreferrer"
                   className="download-btn"
                 >
-                  <span className="download-icon">⬇️</span>
                   Download Resource
                 </a>
               </div>
@@ -193,27 +184,16 @@ const Resources = () => {
     {selectedModule && selectedWeek && resources?.length > 0 && (
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon">📚</div>
           <div className="stat-value">{resources.length}</div>
           <div className="stat-label">Total Resources</div>
         </div>
         
-        {/* <div className="stat-card">
-          <div className="stat-icon">📊</div>
-          <div className="stat-value">
-            {new Set(resources.map(r => r.file?.split('.').pop())).size}
-          </div>
-          <div className="stat-label">File Types</div>
-        </div> */}
-        
         <div className="stat-card">
-          <div className="stat-icon">🎯</div>
           <div className="stat-value">{selectedModule}</div>
           <div className="stat-label">Current Module</div>
         </div>
         
         <div className="stat-card">
-          <div className="stat-icon">📅</div>
           <div className="stat-value">Week {selectedWeek}</div>
           <div className="stat-label">Selected Week</div>
         </div>

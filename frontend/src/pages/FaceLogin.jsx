@@ -96,13 +96,13 @@ export default function FaceLogin() {
 
   const goBack = () => {
     stopCamera();
-    navigate("/login");
+    navigate("/");
   };
 
   return (
     <div className="face-login-page">
       <div className="logo" onClick={goBack}>
-        <span className="logo-text">academiazz</span>
+        <span className="logo-text">Academiazz</span>
         <span className="logo-dot"></span>
       </div>
 

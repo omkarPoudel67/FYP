@@ -30,7 +30,7 @@ export default function useStudentData() {
         );
 
         setStudentData(res.data);
-        console.log(res.data);
+        console.log(studentData);
       } catch (err) {
         console.error("Failed to fetch student data", err);
         setError("Unauthorized");

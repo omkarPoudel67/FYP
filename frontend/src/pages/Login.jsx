@@ -54,7 +54,7 @@ export default function Login() {
   return (
     <div className="login-page">
       <div className="logo">
-        <span className="logo-text">academiazz</span>
+        <span className="logo-text">Academiazz</span>
         <span className="logo-dot"></span>
       </div>
 
@@ -103,10 +103,10 @@ export default function Login() {
             </div>
 
             <div className="form-options">
-              <div className="remember-me">
+              {/* <div className="remember-me">
                 <input type="checkbox" id="remember" />
                 <label htmlFor="remember">Remember me</label>
-              </div>
+              </div> */}
               <span
                 className="forgot-link"
                 onClick={() => setShowForgot(true)}
@@ -143,9 +143,7 @@ export default function Login() {
             Login via Webcam
           </button>
 
-          <div className="signup-prompt">
-            <p>Don't have an account? <a href="/signup">Sign up</a></p>
-          </div>
+         
 
           {error && (
             <div className="error-message">
@@ -162,14 +160,14 @@ export default function Login() {
 
       <div className="login-right">
         <div className="image-overlay"></div>
-        <img src={loginImage} alt="Education" />
+        {/* <img src={loginImage} alt="Education" /> */}
         <div className="quote-container">
-          <svg className="quote-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* <svg className="quote-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 11H6V15H10V11Z" stroke="white" strokeWidth="2" strokeLinecap="round"/>
             <path d="M18 11H14V15H18V11Z" stroke="white" strokeWidth="2" strokeLinecap="round"/>
             <path d="M10 11V9C10 7.89543 10.8954 7 12 7" stroke="white" strokeWidth="2"/>
             <path d="M18 11V9C18 7.89543 17.1046 7 16 7" stroke="white" strokeWidth="2"/>
-          </svg>
+          </svg> */}
           <h2>
             “Education is the most powerful weapon which you can use to change
             the world.”

@@ -8,7 +8,7 @@ import os
 
 def init_face_model():
     model = insightface.app.FaceAnalysis(name="buffalo_l")
-    model.prepare(ctx_id=0)  # 0 = GPU, -1 = CPU
+    model.prepare(ctx_id=1) 
     return model
 
 def read_image(image_path=None, from_webcam=False):

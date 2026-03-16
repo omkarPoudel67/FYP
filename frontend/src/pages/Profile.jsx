@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useAuth } from "../context/authcontext";
-import "./CSS/Profile.css";
+import "./CSS/profile.css";
 
 const Profile = () => {
   const { accessToken, setAccessToken, api, refreshAccessToken } = useAuth();

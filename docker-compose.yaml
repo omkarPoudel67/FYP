@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+  backend:
+    build: ./academiazz
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./academiazz:/app
+    env_file:
+      - ./vars/.env
+  celery:
+    build: ./context
+    command: celery -A academiazz worker --loglevel=info --pool=solo
+    volumes:
+      - ./academiazz:/app
+    env_file:
+      - ./vars/.env
+    depends_on:
+      - backend
+      - redis
+  
+  celery_beat:
+    build: ./context
+    command: celery -A academiazz beat --loglevel=info
+    volumes:
+      - ./academiazz:/app
+    env_file:
+      - ./vars/.env
+    depends_on:
+      - backend
+      - redis
+  
+  frontend:
+    build: ./frontend
+    ports: 
+      - "5173:5173"
+    volumes: 
+      - ./frontend:/app
+      - /app/package*.json
+      - /app/node_modules

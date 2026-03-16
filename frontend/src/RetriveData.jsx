@@ -233,3 +233,38 @@ export function useAnnouncements() {
 
   return { announcements, loading, error };
 }
+
+export function useAttendanceHistory() {
+  const { accessToken, api } = useAuth();
+  const [attendance, setAttendance] = useState({ past: [], today: [], todays_schedule: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!accessToken) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchAttendance = async () => {
+      try {
+        const res = await api.get("/attendance/history/", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        setAttendance(res.data);
+        console.log("Attendance fetched:", res.data);
+      } catch (err) {
+        console.error("Failed to fetch attendance history:", err);
+        setError("Failed to load attendance history");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAttendance();
+  }, [accessToken, api]);
+
+  return { attendance, loading, error };
+}

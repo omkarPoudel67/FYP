@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../auth";
 import ForgotPassword from "./ForgotPassword";
-import "./CSS/Login.css";
+import "./CSS/login.css";
 import loginImage from "../public/login.jpg";
 import { useAuth } from "../context/authcontext.jsx";
 const BASE_URL = "http://localhost:8000/api";
@@ -61,7 +61,7 @@ export default function Login() {
       <div className="login-left">
         <div className="login-left-content">
           <div className="welcome-section">
-            <h2>Welcome Back! </h2>
+            <h2 color="red">Welcome Back! </h2>
             <p className="welcome-subtitle">Please enter your details to sign in</p>
           </div>
 

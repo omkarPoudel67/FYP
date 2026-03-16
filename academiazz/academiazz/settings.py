@@ -8,8 +8,12 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
-"""
 
+"""
+from django.core.mail import send_mail
+from django.conf import settings
+
+from celery.schedules import crontab
 from pathlib import Path
 from datetime import timedelta
 from corsheaders.defaults import default_headers
@@ -29,6 +33,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+
+
+CELERY_BEAT_SCHEDULE = {
+    'mark-absent-students': {
+        'task': 'attendance.tasks.mark_absent_students',
+        'schedule': 120,  
+    },
+}
 
 # Application definition
 
@@ -50,7 +62,8 @@ INSTALLED_APPS = [
     'announcements',
     'corsheaders',
     'facial_recognition',
-    'attendance'
+    'attendance',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -126,6 +139,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -179,5 +195,3 @@ TIME_ZONE = 'Asia/Kathmandu'
 USE_TZ = True
 
 
-from django.core.mail import send_mail
-from django.conf import settings

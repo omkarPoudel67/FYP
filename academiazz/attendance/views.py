@@ -13,12 +13,40 @@ import cv2
 load_dotenv("../.env")
 import numpy as np
 from django.contrib.auth import get_user_model
-from .models import AttendanceHistory
+from .models import AttendanceHistory, ClassSession
 from django.utils import timezone
+from rest_framework.response import Response
+from attendance.serializers import AttendanceHistorySerializer, ClassSessionSerializer
+import json
+from django.views.decorators.csrf import csrf_exempt
 
+
+ALLOWED_IP = "103.41.173.36"
+
+@csrf_exempt
+def check_ip(request):
+    print("Request method:", request.method)
+    print("Raw body:", request.body)
+
+    try:
+        data = json.loads(request.body)
+        print("Parsed JSON:", data)
+
+        ip = data.get("ip")
+        print("IP received:", ip)
+
+        if ip == "103.41.173.36":
+            return JsonResponse({"status": "ok", "message": "Access granted"})
+        
+        return JsonResponse({"status": "error", "message": f"Access denied for IP {ip}."})
+
+    except Exception as e:
+        print("Error while parsing JSON:", str(e))
+        return JsonResponse({"status": "error", "message": "Invalid JSON"})
 
 # Create your views here.
-@api_view(["POST"])
+#@api_view(["POST"])
+@csrf_exempt
 def mark_attendance(request):
     model = init_face_model()
     api_key = os.environ.get("PINECONE_API_KEY")
@@ -72,3 +100,35 @@ def mark_attendance(request):
             'Error': str(e)
         })
     
+@api_view(['GET'])
+def get_attendance_history(request):
+    try:
+        student = request.user.students
+        group_id = student.group_id
+
+        # past attendance
+        past = AttendanceHistory.objects.filter(
+            student=student,
+            session__status='past'
+        ).order_by('-date')
+
+        # today's attendance
+        today = AttendanceHistory.objects.filter(
+            student=student,
+            session__status='today'
+        ).order_by('-marked_at')
+
+        # today's schedule
+        todays_schedule = ClassSession.objects.filter(
+            status='today',
+            schedule__group_id=group_id
+        ).select_related("schedule")
+        return Response({
+            "past": AttendanceHistorySerializer(past, many=True).data,
+            "today": AttendanceHistorySerializer(today, many=True).data,
+            "todays_schedule": ClassSessionSerializer(todays_schedule, many=True).data
+        })
+
+    except Exception as e:
+        print("Error occurred:", e)
+        return Response({"error": str(e)}, status=400)

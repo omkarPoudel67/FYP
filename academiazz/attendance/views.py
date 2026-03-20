@@ -23,29 +23,31 @@ from django.views.decorators.csrf import csrf_exempt
 
 ALLOWED_IP = "103.41.173.36"
 
+@api_view(["POST"])
 @csrf_exempt
 def check_ip(request):
     print("Request method:", request.method)
     print("Raw body:", request.body)
+    return JsonResponse({"status": "ok", "message": "Access granted"})
 
-    try:
-        data = json.loads(request.body)
-        print("Parsed JSON:", data)
+    # try:
+    #     data = json.loads(request.body)
+    #     print("Parsed JSON:", data)
 
-        ip = data.get("ip")
-        print("IP received:", ip)
+    #     ip = data.get("ip")
+    #     print("IP received:", ip)
 
-        if ip == "103.41.173.36":
-            return JsonResponse({"status": "ok", "message": "Access granted"})
+    #     if ip == "103.41.173.36":
+    #         return JsonResponse({"status": "ok", "message": "Access granted"})
         
-        return JsonResponse({"status": "error", "message": f"Access denied for IP {ip}."})
+    #     return JsonResponse({"status": "error", "message": f"Access denied for IP {ip}."})
 
-    except Exception as e:
-        print("Error while parsing JSON:", str(e))
-        return JsonResponse({"status": "error", "message": "Invalid JSON"})
+    # except Exception as e:
+    #     print("Error while parsing JSON:", str(e))
+    #     return JsonResponse({"status": "error", "message": "Invalid JSON"})
 
 # Create your views here.
-#@api_view(["POST"])
+@api_view(["POST"])
 @csrf_exempt
 def mark_attendance(request):
     model = init_face_model()

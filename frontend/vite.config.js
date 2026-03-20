@@ -4,13 +4,19 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: true,        
+    port: 5173,        
     fs: {
-      strict: false, // allows Vite to serve files outside root
+      strict: false,
+    },
+    watch: {          
+      usePolling: true,
+      interval: 1000,
     },
   },
   build: {
     rollupOptions: {
-      input: "/index.html", // ensures SPA fallback works
+      input: "/index.html",
     },
   },
 });

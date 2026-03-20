@@ -34,7 +34,7 @@ def login_view(request):
             login(request, user)
             messages.success(request, f'Welcome{user.username}!')
             if hasattr(user, 'Students'):
-                return redirect('student_dashboard')
+                return redirect('sudent_dashboardt')
             
             elif hasattr(user, 'teachers'):
                 return redirect('teacher_dashboard')

@@ -40,5 +40,4 @@ services:
       - "5173:5173"
     volumes: 
       - ./frontend:/app
-      - /app/package*.json
       - /app/node_modules

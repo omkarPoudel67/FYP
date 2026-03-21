@@ -100,7 +100,7 @@ def mark_attendance(request):
         # print("Error occured: ",e)
         return JsonResponse({
             'Error': str(e)
-        })
+        }, status = 400)
     
 @api_view(['GET'])
 def get_attendance_history(request):

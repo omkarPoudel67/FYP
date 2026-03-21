@@ -199,7 +199,7 @@ const percentageData = (() => {
 
   return (
     <div className="attendance-page">
-      <Sidebar />
+      {/* <Sidebar /> */}
 
       <div className="attendance-content">
 

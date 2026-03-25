@@ -73,6 +73,7 @@ def mark_attendance(request):
 
         if not match:
             return JsonResponse({"success": False, "message": "Face not recognized."})
+            
         
         if user_id_str != str(request.user.id):
             return JsonResponse({"success": False,
@@ -82,10 +83,11 @@ def mark_attendance(request):
         
         group_id = request.user.students.group_id
         ongoing_class, present_status, session = get_current_running_class(group_id)
+        ongoing_class = request.POST.get("session_id")
         
         AttendanceHistory.objects.create(
             student=request.user.students,
-            schedule=ongoing_class,
+            schedule=session.schedule,
             session=session,
             status='present' if present_status else 'late',
         )

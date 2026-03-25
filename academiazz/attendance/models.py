@@ -60,8 +60,8 @@ class AttendanceHistory(models.Model):
     )
     marked_at = models.DateTimeField(default=timezone.localtime)
 
-    class Meta:
-        unique_together = ['student', 'schedule', 'date']
+    # class Meta:
+    #     unique_together = ['student', 'schedule', 'date']
 
     def __str__(self):
         return f"{self.student} - {self.schedule} - {self.date} - {self.status}"

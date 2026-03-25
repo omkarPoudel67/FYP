@@ -29,6 +29,7 @@ const Attendance = () => {
   const { accessToken, api } = useAuth();
   const { attendance, loading, error } = useAttendanceHistory();
   const now = new Date();
+  const sessionIdRef = useRef(null);
 
   const [message, setMessage]         = useState("");
   const [messageType, setMessageType] = useState("info");
@@ -122,7 +123,7 @@ const percentageData = (() => {
   };
 
   // ─── Step 1: Check IP ─────────────────────────────────────────────────────
-  const handleTakeAttendance = async () => {
+  const handleTakeAttendance = async (sessionId) => {
     showMessage("Verifying your network...", "info");
     try {
       const ipRes  = await fetch("https://api.ipify.org?format=json");
@@ -134,7 +135,7 @@ const percentageData = (() => {
       );
       if (res.data.status === "ok") {
         showMessage("IP verified. Opening camera...", "info");
-        openCamera();
+        openCamera(sessionId);
       } else {
         showMessage(res.data.message || "IP verification failed.", "error");
       }
@@ -144,7 +145,9 @@ const percentageData = (() => {
   };
 
   // ─── Step 2: Open Camera ──────────────────────────────────────────────────
-  const openCamera = async () => {
+  const openCamera = async (sessionId) => {
+    sessionIdRef.current = sessionId;
+
     try {
       setCameraOpen(true);
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -179,11 +182,12 @@ const percentageData = (() => {
       }
       const formData = new FormData();
       formData.append("image", blob, "face.jpg");
+      formData.append("session_id", sessionIdRef.current);
       try {
         const res = await api.post("/attendance/mark/", formData, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        if (res.data.status === "ok") {
+        if (res.data.Success === true) {
           showMessage("Attendance marked successfully!", "success");
           stopCamera();
         } else {
@@ -199,7 +203,7 @@ const percentageData = (() => {
 
   return (
     <div className="attendance-page">
-      {/* <Sidebar /> */}
+      <Sidebar />
 
       <div className="attendance-content">
 
@@ -303,7 +307,7 @@ const percentageData = (() => {
                   );
                 } else if (showButton) {
                   displayStatus = (
-                    <button className="btn-attendance" onClick={handleTakeAttendance}>
+                    <button className="btn-attendance" onClick={() => handleTakeAttendance(s.id)}>
                       <Camera size={14} />
                       Take Attendance
                     </button>

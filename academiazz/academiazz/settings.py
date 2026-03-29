@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 
 """
+import os
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -194,4 +195,5 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 TIME_ZONE = 'Asia/Kathmandu'
 USE_TZ = True
 
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

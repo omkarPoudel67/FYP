@@ -29,5 +29,6 @@ urlpatterns = [
     path('schedule/', include('schedules.urls')),
     path('announcements/', include('announcements.urls')),
     path('attendance/', include('attendance.urls')),
+    path('chatbot/', include('chatbot.urls'))
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,6 +1,7 @@
 import os
-from langchain_ollama import OllamaLLM
-from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain_ollama import ChatOllama
+from langchain_classic.agents import AgentExecutor
+from langchain_classic.agents import create_tool_calling_agent
 from langchain.tools import tool
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import SystemMessage
@@ -43,8 +44,8 @@ _llm = None
 def get_llm():
     global _llm
     if _llm is None:
-        _llm = OllamaLLM(
-            model="llama3",
+        _llm = ChatOllama(
+            model="llama3-groq-tool-use",
             temperature=0.2
         )
     return _llm
@@ -325,9 +326,9 @@ def build_agent(student):
     agent_executor = AgentExecutor(
         agent=agent,
         tools=tools,
-        verbose=True,      # prints tool calls to terminal — great for debugging
-        max_iterations=5,  # prevents infinite loops
-        handle_parsing_errors=True  # handles LLM output errors gracefully
+        verbose=True,      
+        max_iterations=5,  
+        handle_parsing_errors=True  
     )
 
     return agent_executor

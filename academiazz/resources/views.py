@@ -66,7 +66,9 @@ def get_resources(request):
 
 
 def download_resource(request, filename):
+    
     file_path = os.path.join(settings.MEDIA_ROOT, "resources/pdfs", filename)
+    print(file_path)
     if os.path.exists(file_path):
         response = FileResponse(open(file_path, 'rb'))
         response['Content-Disposition'] = f'attachment; filename="{filename}"'

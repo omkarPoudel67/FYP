@@ -10,6 +10,12 @@ class Module(models.Model):
 
 
 class Resource(models.Model):
+    SESSION_TYPES = [
+        ('lecture', 'Lecture'),
+        ('tutorial', 'Tutorial'),
+        ('workshop', 'Workshop'),
+    ]
+
     #user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default = "NULL")
     file = models.FileField(upload_to='resources/pdfs/')
     title = models.CharField(max_length=255)
@@ -17,6 +23,7 @@ class Resource(models.Model):
 
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
     level = models.CharField(max_length=255)
+    type = models.CharField(max_length=20, choices=SESSION_TYPES, default='lecture')
     week = models.IntegerField(null=True, blank=True)
     uploaded_by = models.CharField(max_length=255)
     uploaded_at = models.DateTimeField(auto_now_add=True)

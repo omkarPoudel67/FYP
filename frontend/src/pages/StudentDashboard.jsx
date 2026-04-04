@@ -10,6 +10,7 @@ import { useWeeks } from "../RetriveData";
 import { useResources } from "../RetriveData";
 import { useSchedules } from "../RetriveData";
 import { useAnnouncements } from "../RetriveData";
+import ChatBot  from "./ChatBot";
 
 export default function StudentDashboard() {
   const { studentData, loading, error } = useStudentData();
@@ -171,6 +172,7 @@ export default function StudentDashboard() {
 
   return (
     <div className="dashboard-container">
+      <ChatBot />
       <Sidebar />
       
       <div className="student-dashboard">

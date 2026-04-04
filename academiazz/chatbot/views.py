@@ -3,10 +3,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from langchain_core.messages import HumanMessage, AIMessage
+from langchain_community.callbacks import get_openai_callback
 
 from students.models import Students
 from .serializers import ChatMessageSerializer, ChatResponseSerializer
 from .rag.agent import build_agent
+
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import AllowAny
 
 
 class ChatbotView(APIView):
@@ -46,11 +50,17 @@ class ChatbotView(APIView):
 
         # invoke agent
         try:
-            result = agent_executor.invoke({
-                "input": message,
-                "chat_history": chat_history
-            })
-            response_text = result['output']
+            with get_openai_callback() as cb:
+                result = agent_executor.invoke({
+                    "input": message,
+                    "chat_history": chat_history
+                })
+                response_text = result['output']
+                
+                print(f"Input tokens:  {cb.prompt_tokens}")
+                print(f"Output tokens: {cb.completion_tokens}")
+                print(f"Total tokens:  {cb.total_tokens}")
+
         except Exception as e:
             return Response(
                 {"error": f"Agent error: {str(e)}"},

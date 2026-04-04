@@ -9,7 +9,11 @@ from langchain_core.messages import SystemMessage
 from langchain_groq import ChatGroq
 from django.db.models import Count, Q
 from django.utils import timezone
-
+from typing import Optional
+from .indexer import query_resource
+from django.conf import settings
+from chatbot.rag.indexer import query_resource
+from resources.models import Resource
 from attendance.models import AttendanceHistory, ClassSession
 from schedules.models import Schedule
 from students.models import Students
@@ -48,8 +52,8 @@ def get_llm():
     if _llm is None:
         _llm = ChatGroq(
             api_key=os.getenv("GROQ_API_KEY"),
-            model="llama-3.3-70b-versatile",
-            temperature=0.2
+            model="openai/gpt-oss-120b",
+            temperature=0.3
         )
     return _llm
 
@@ -62,7 +66,7 @@ class StudentTools:
         student = self.student 
      
         @tool
-        def get_attendance_summary(module_name: str = None) -> str:
+        def get_attendance_summary(module_name: Optional[str] = None) -> str:
             """
             Use this when student asks about:
             - attendance percentage or record
@@ -107,7 +111,7 @@ class StudentTools:
                 code = record['schedule__module__code']
 
                 percentage = round((present / total) * 100, 1) if total > 0 else 0
-                status = "⚠️ AT RISK" if percentage < 75 else "✅ SATISFACTORY"
+                status = " AT RISK" if percentage < 75 else " SATISFACTORY"
 
                 lines.append(
                     f"{module} ({code}): {percentage}% "
@@ -119,8 +123,8 @@ class StudentTools:
         
         @tool
         def get_schedule(
-            day: str = None,
-            module_name: str = None,
+            day: Optional[str] = None,
+            module_name: Optional[str] = None,
             get_next: bool = False,
             get_today: bool = False
         ) -> str:
@@ -246,7 +250,7 @@ class StudentTools:
                 f"Modules enrolled: {module_list}"
             )
         @tool
-        def get_announcements(keyword: str = None) -> str:
+        def get_announcements(keyword: Optional[str]  = None) -> str:
             """
             Use this when student asks about:
             - any announcements or news
@@ -259,14 +263,14 @@ class StudentTools:
             """
             query = Announcement.objects.all()
 
-            # filter by keyword if provided
+
             if keyword:
                 query = query.filter(
                     Q(title__icontains=keyword) |
                     Q(description__icontains=keyword)
                 )
 
-            # get latest 5 announcements
+         
             announcements = query[:5]
 
             if not announcements:
@@ -277,13 +281,73 @@ class StudentTools:
             lines = []
             for announcement in announcements:
                 lines.append(
-                    f"📢 {announcement.title}\n"
+                    f" {announcement.title}\n"
                     f"   {announcement.description}\n"
                     f"   Posted by: {announcement.created_by.get_full_name() or announcement.created_by.username}\n"
                     f"   Date: {announcement.upload_time.strftime('%B %d, %Y')}"
                 )
 
             return "\n\n".join(lines)
+                
+        @tool
+        def get_class_resources(
+            module_name: Optional[str] = None,
+            week: Optional[int] = None,
+            session_type: Optional[str] = None,
+            question: Optional[str] = None,
+            specific: bool = False
+        ) -> str:
+            """
+            Use this when a student asks about:
+            - what was covered or taught in a class
+            - what did we learn in week X of subject Y
+            - summary of a lecture, tutorial, or workshop
+            - study materials or resources for a subject
+            - download links for class notes or slides
+            - specific topic from a class e.g 'explain decision trees from week 3'
+            Use module_name for the subject e.g 'AI', 'Math'.
+            Use week for a specific week number e.g 3.
+            Use session_type for 'lecture', 'tutorial', or 'workshop'.
+            Use question to pass the student's exact question.
+            Set specific=True if student is asking about a particular topic within the material.
+            Set specific=False if student just wants a general summary of what was covered.
+            """
+
+            # Query the database
+            query = Resource.objects.select_related('module').all()
+
+            if module_name:
+                query = query.filter(module__name__icontains=module_name)
+            if week is not None:
+                query = query.filter(week=week)
+            if session_type:
+                query = query.filter(type__icontains=session_type)
+
+            if not query.exists():
+                return "No resources found matching your query."
+
+            rag_question = question or "What are the main topics covered in this material?"
+            results = []
+
+            for resource in query:
+                result = query_resource(resource, rag_question)
+
+                overall_summary = result["overall_summary"]
+                chunk_content   = result["chunk_content"]
+                metadata        = result["metadata"]
+
+
+                content = chunk_content if specific else overall_summary
+
+                results.append(
+                    f"Title: {metadata.get('title', resource.title)}\n"
+                    f"Module: {metadata.get('module')} ({metadata.get('module_code')})\n"
+                    f"Type: {metadata.get('type', '').capitalize()} | Week: {metadata.get('week', 'N/A')}\n"
+                    f"Download: http://localhost/resources/download/{resource.file.name.split('/')[-1]}\n\n"
+                    f"{'Relevant Content' if specific else 'Summary'}:\n{content}"
+)
+
+            return "\n\n---\n\n".join(results)
                            
 
             
@@ -294,6 +358,7 @@ class StudentTools:
                 get_schedule,
                 get_student_info,
                 get_announcements,
+                get_class_resources,
                 ]  
 
 def build_agent(student):

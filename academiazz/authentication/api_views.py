@@ -78,26 +78,15 @@ def refresh_access_token(request):
 @permission_classes([AllowAny])
 def login_api(request):
     User = get_user_model()
-    print("\n===== USER DEBUG LIST =====")
-    for u in User.objects.all():
-        print(f"ID: {u.id}")
-        print(f"Username: {u.username}")
-        print(f"Password Hash: {u.password}")   # <-- NOT PLAIN PASSWORD
-        print("---------------------------")
-    print("===== END USER LIST =====\n")
-    print(" Login API Called")
-    print(" Request Data:", request.data)
+
 
     username = request.data.get("username")
     password = request.data.get("password")
 
-    print("➡️ Username:", username)
-    print("➡️ Password:", password)
-
     user = authenticate(username=username, password=password)
 
     if user is None:
-        return Response({"success": False, "message": "Invalid credentials"})
+        return Response({"success": False, "message": "Invalid credentials"},status=401)
 
     refresh = RefreshToken.for_user(user)
     access = refresh.access_token

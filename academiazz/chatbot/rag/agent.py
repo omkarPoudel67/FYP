@@ -1,11 +1,12 @@
 import os
+from dotenv import load_dotenv
 from langchain_ollama import ChatOllama
 from langchain_classic.agents import AgentExecutor
 from langchain_classic.agents import create_tool_calling_agent
 from langchain.tools import tool
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import SystemMessage
-
+from langchain_groq import ChatGroq
 from django.db.models import Count, Q
 from django.utils import timezone
 
@@ -42,10 +43,12 @@ The student you are helping is: {student_name}
 _llm = None
 
 def get_llm():
+    load_dotenv()
     global _llm
     if _llm is None:
-        _llm = ChatOllama(
-            model="llama3-groq-tool-use",
+        _llm = ChatGroq(
+            api_key=os.getenv("GROQ_API_KEY"),
+            model="llama-3.3-70b-versatile",
             temperature=0.2
         )
     return _llm
@@ -298,13 +301,13 @@ def build_agent(student):
     Builds and returns the agent executor for a given student.
     Called once per API request.
     """
-    # get LLM
+
     llm = get_llm()
 
-    # get tools scoped to this student
+   
     tools = StudentTools(student).get_tools()
 
-    # build the prompt
+   
     prompt = ChatPromptTemplate.from_messages([
         SystemMessage(content=SYSTEM_PROMPT.format(
             today=timezone.localdate().strftime("%A, %B %d, %Y"),
@@ -315,14 +318,14 @@ def build_agent(student):
         MessagesPlaceholder(variable_name="agent_scratchpad"),
     ])
 
-    # create agent
+
     agent = create_tool_calling_agent(
         llm=llm,
         tools=tools,
         prompt=prompt
     )
 
-    # create executor
+
     agent_executor = AgentExecutor(
         agent=agent,
         tools=tools,

@@ -4,6 +4,7 @@ import './CSS/Sidebar.css';
 import { useAuth } from '../context/authcontext.jsx';
 import { useNavigate, useLocation } from "react-router-dom";
 import useStudentData from '../RetriveData.jsx';
+import ChatBot  from "./ChatBot";
 
 const Sidebar = () => {
   const { studentData, error, loading } = useStudentData();
@@ -122,6 +123,7 @@ const Sidebar = () => {
   }
 
   return (
+    
     <div className="sidebar">
       {/* Logo Section */}
       <div className="sidebar-logo">
@@ -141,6 +143,7 @@ const Sidebar = () => {
         <div className="profile-info">
           {studentData ? (
             <>
+            <ChatBot />
               <h4 className="profile-name">
                 {studentData.user?.first_name || ''} {studentData.user?.last_name || ''}
               </h4>

@@ -1,6 +1,6 @@
 from celery import shared_task
 from resources.models import Resource
-from .indexer import index_resource
+from .rag.indexer import index_resource
 
 @shared_task
 def index_resource_task(resource_id):

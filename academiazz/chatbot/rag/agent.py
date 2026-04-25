@@ -343,7 +343,7 @@ class StudentTools:
                     f"Title: {metadata.get('title', resource.title)}\n"
                     f"Module: {metadata.get('module')} ({metadata.get('module_code')})\n"
                     f"Type: {metadata.get('type', '').capitalize()} | Week: {metadata.get('week', 'N/A')}\n"
-                    f"Download: http://localhost/resources/download/{resource.file.name.split('/')[-1]}\n\n"
+                    f"Download: http://localhost:8000/resources/download/{resource.file.name.split('/')[-1]}\n\n"
                     f"{'Relevant Content' if specific else 'Summary'}:\n{content}"
 )
 
@@ -395,7 +395,7 @@ def build_agent(student):
         agent=agent,
         tools=tools,
         verbose=True,      
-        max_iterations=5,  
+        max_iterations=10,  
         handle_parsing_errors=True  
     )
 

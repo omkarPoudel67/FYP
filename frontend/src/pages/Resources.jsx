@@ -166,7 +166,7 @@ const Resources = () => {
                 </div>
                 
                 <a
-                  href={`http://localhost:8000${res.file}`}
+                  href={`http://localhost:8000/resources/download/${res.file.split('/').pop()}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="download-btn"

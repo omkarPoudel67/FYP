@@ -2,6 +2,7 @@ import React from "react";
 import Sidebar from "./Sidebar";
 import { useAnnouncements } from "../RetriveData";
 import './CSS/announcements.css';
+import { Icon } from "@iconify/react";
 
 const Announcements = () => {
   const {
@@ -51,7 +52,9 @@ const Announcements = () => {
           {!AnnounceLoading && !AnnounceError && announcements.length > 0 && (
             <div className="header-stats">
               <div className="stat-badge">
-                <div className="stat-icon">📢</div>
+                <div className="stat-icon">
+  <Icon icon="mdi:bullhorn" width="24" height="24" />
+</div>
                 {/* <div className="stat-icon"></div> */}
                 <div className="stat-info">
                   <h4>{announcements.length}</h4>

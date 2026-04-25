@@ -47,9 +47,7 @@ def test_get_modules_valid_group(authenticated_client, group):
     assert response.status_code == 200
     assert "Python" in response.data["modules"]
 
-# ==================
-# get_weeks tests
-# ==================
+
 def test_get_weeks_no_module(authenticated_client, db):
     response = authenticated_client.get("/resources/weeks/")
     assert response.status_code == 400
@@ -64,9 +62,6 @@ def test_get_weeks_valid_module(authenticated_client, resource):
     assert response.status_code == 200
     assert 1 in response.data["weeks"]
 
-# ==================
-# get_resources tests
-# ==================
 def test_get_resources_missing_params(authenticated_client, db):
     response = authenticated_client.get("/resources/resources/")
     assert response.status_code == 400

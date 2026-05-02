@@ -13,6 +13,7 @@ import Attendance from './pages/Attendence';
 import Resources from './pages/Resources';
 import Announcements from './pages/Announcements';
 import Unauthorized401 from './pages/UnAuthorized';
+import PublicDashboard from './pages/PublicDashboard';
 
 
 
@@ -34,7 +35,8 @@ function App() {
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/announcements" element={<Announcements />} />
         <Route path="/attendance" element={<Attendance />} />
-        <Route path='/unauthorized' element={<Unauthorized401 />}></Route>
+        <Route path='/unauthorized' element={<Unauthorized401 />}/>
+        <Route path='/public' element={<PublicDashboard />}/>
       </Routes>
     </Router>
   );

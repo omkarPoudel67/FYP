@@ -1,3 +1,4 @@
+// Login.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../auth";
@@ -16,6 +17,10 @@ export default function Login() {
   const [showForgot, setShowForgot] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const goToPublicDashboard = () =>{
+    navigate("/public")
+  }
 
   const goToFaceLogin = () => {
     navigate("/face-login");
@@ -57,6 +62,15 @@ export default function Login() {
         <span className="logo-text">Academiazz</span>
         <span className="logo-dot"></span>
       </div>
+
+      {/* Public Dashboard Button - Top Right */}
+      <button className="public-dashboard-btn" onClick={goToPublicDashboard}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 9L12 3L21 9L12 15L3 9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M5 12V18L12 21L19 18V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        Public Dashboard
+      </button>
 
       <div className="login-left">
         <div className="login-left-content">
@@ -103,10 +117,6 @@ export default function Login() {
             </div>
 
             <div className="form-options">
-              {/* <div className="remember-me">
-                <input type="checkbox" id="remember" />
-                <label htmlFor="remember">Remember me</label>
-              </div> */}
               <span
                 className="forgot-link"
                 onClick={() => setShowForgot(true)}
@@ -143,8 +153,6 @@ export default function Login() {
             Login via Webcam
           </button>
 
-         
-
           {error && (
             <div className="error-message">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -160,14 +168,7 @@ export default function Login() {
 
       <div className="login-right">
         <div className="image-overlay"></div>
-        {/* <img src={loginImage} alt="Education" /> */}
         <div className="quote-container">
-          {/* <svg className="quote-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 11H6V15H10V11Z" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            <path d="M18 11H14V15H18V11Z" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            <path d="M10 11V9C10 7.89543 10.8954 7 12 7" stroke="white" strokeWidth="2"/>
-            <path d="M18 11V9C18 7.89543 17.1046 7 16 7" stroke="white" strokeWidth="2"/>
-          </svg> */}
           <h2>
             “Education is the most powerful weapon which you can use to change
             the world.”

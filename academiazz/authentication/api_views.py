@@ -76,7 +76,7 @@ def refresh_access_token(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsTeacher])
+@permission_classes([AllowAny])
 def login_api(request):
     User = get_user_model()
 

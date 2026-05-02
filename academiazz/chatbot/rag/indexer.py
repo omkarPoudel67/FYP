@@ -19,16 +19,16 @@ os.makedirs(MODULES_DIR, exist_ok=True)
 
 
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-_embeddings = None
+embeddings = None
 _llm = None
 
-def get_embeddings():
-    global _embeddings
-    if _embeddings is None:
+def getembeddings():
+    global embeddings
+    if embeddings is None:
         print("Loading embedding model...")
-        _embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+        embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
         print("Embedding model loaded")
-    return _embeddings
+    return embeddings
 
 def get_llm():
     global _llm
@@ -138,7 +138,7 @@ def index_resource(resource):
         chunk.metadata["overall_summary"] = overall_summary
 
    
-    vectorstore = FAISS.from_documents(chunks, get_embeddings())
+    vectorstore = FAISS.from_documents(chunks, getembeddings())
 
 
     index_path = get_index_path(resource)
@@ -165,7 +165,7 @@ def query_resource(resource, question: str, k: int = 4) -> dict:
 
     vectorstore = FAISS.load_local(
         index_path,
-        get_embeddings(),
+        getembeddings(),
         allow_dangerous_deserialization=True
     )
 

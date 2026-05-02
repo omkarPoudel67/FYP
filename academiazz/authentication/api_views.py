@@ -18,6 +18,7 @@ import datetime
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
 from django.views.decorators.csrf import csrf_exempt
+from .decorators import IsStudent, IsTeacher
 
 # def check_access_token(user):
 #     auth_header = request.headers.get("Authorization")
@@ -75,7 +76,7 @@ def refresh_access_token(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsTeacher])
 def login_api(request):
     User = get_user_model()
 

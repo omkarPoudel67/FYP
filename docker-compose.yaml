@@ -1,30 +1,26 @@
 version: "3.9"
 services:
   redis:
-    image: redis:latest
+    image: redis:alpine
     ports:
       - "6379:6379"
 
   backend:
-    build: ./academiazz
+    image: academiazz-app
     ports:
       - "8000:8000"
     volumes:
       - ./academiazz:/app
-      - media_files:/app/media        # named volume for media files
-      - faiss_indexes:/app/faiss_indexes  # named volume for FAISS indexes
     env_file:
       - ./vars/.env
     depends_on:
       - redis
 
   celery:
-    build: ./academiazz              # same as backend
+    image: academiazz-app             
     command: celery -A academiazz worker --loglevel=info --pool=solo
     volumes:
       - ./academiazz:/app
-      - media_files:/app/media        # same media volume — can read uploaded PDFs
-      - faiss_indexes:/app/faiss_indexes  # same FAISS volume — can save indexes
     env_file:
       - ./vars/.env
     depends_on:
@@ -32,12 +28,10 @@ services:
       - redis
 
   celery_beat:
-    build: ./academiazz              # same as backend
+    image: academiazz-app             
     command: celery -A academiazz beat --loglevel=info
     volumes:
       - ./academiazz:/app
-      - media_files:/app/media
-      - faiss_indexes:/app/faiss_indexes
     env_file:
       - ./vars/.env
     depends_on:

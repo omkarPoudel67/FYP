@@ -11,6 +11,9 @@ from .rag.agent import build_agent
 
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
+from .rag.indexer import embeddings
+
+print (embeddings == None) 
 
 
 class ChatbotView(APIView):
@@ -67,7 +70,7 @@ class ChatbotView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # update chat history with this exchange
+   
         chat_history_data.append({
             "role": "human",
             "content": message
@@ -77,12 +80,10 @@ class ChatbotView(APIView):
             "content": response_text
         })
 
-        # keep only last 10 messages — 5 exchanges
-        # prevents context window from growing too large
+
         if len(chat_history_data) > 10:
             chat_history_data = chat_history_data[-10:]
 
-        # serialize and return response
         response_serializer = ChatResponseSerializer({
             "response": response_text,
             "chat_history": chat_history_data

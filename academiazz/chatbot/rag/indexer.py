@@ -7,6 +7,9 @@ from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 from dotenv import load_dotenv
+from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, UnstructuredWordDocumentLoader
+from retrival import retrieve_public_context
+
 
 load_dotenv()
 
@@ -14,6 +17,7 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 FAISS_DIR = os.path.join(BASE_DIR, "faiss_indexes")
 MODULES_DIR = os.path.join(FAISS_DIR, "modules")
+PUBLIC_INDEX_PATH = os.path.join(FAISS_DIR, "public_knowledge") 
 
 os.makedirs(MODULES_DIR, exist_ok=True)
 
@@ -21,6 +25,19 @@ os.makedirs(MODULES_DIR, exist_ok=True)
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 embeddings = None
 _llm = None
+
+
+def get_loader(file_path: str):
+    """Return the appropriate loader based on file extension."""
+    ext = os.path.splitext(file_path)[1].lower()
+    if ext == ".pdf":
+        return PyPDFLoader(file_path)
+    elif ext == ".docx":
+        return Docx2txtLoader(file_path)
+    elif ext == ".doc":
+        return UnstructuredWordDocumentLoader(file_path)
+    else:
+        raise ValueError(f"Unsupported file type: {ext}")
 
 def getembeddings():
     global embeddings
@@ -87,12 +104,13 @@ Section Summaries:
 def index_resource(resource):
 
     pdf_path = os.path.join(settings.MEDIA_ROOT, str(resource.file))
+    
 
     if not os.path.exists(pdf_path):
         print(f"PDF not found: {pdf_path}")
         return
 
-    loader = PyPDFLoader(pdf_path)
+    loader = get_loader(pdf_path)
     pages = loader.load()
 
     if not pages:
@@ -191,3 +209,51 @@ def query_resource(resource, question: str, k: int = 4) -> dict:
         "chunk_content"   : chunk_content,    
         "metadata"        : metadata          
     }
+
+def index_public_knowledge(document):
+
+    pdf_path = os.path.join(settings.MEDIA_ROOT, str(document.file))
+
+    if not os.path.exists(pdf_path):
+        print(f"PDF not found: {pdf_path}")
+        return
+    
+    loader = get_loader(pdf_path)
+    pages  = loader.load()
+
+    if not pages:
+        print(f"Could not extract content from: {pdf_path}")
+        return
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size    = 500,
+        chunk_overlap = 50
+    )
+    chunks = splitter.split_documents(pages)
+
+    if not chunks:
+        print(f"No chunks extracted from: {pdf_path}")
+        return
+
+    for chunk in chunks:
+        chunk.metadata.update({
+            "document_id" : document.id,
+            "title"       : document.title,
+            "type"        : document.type,
+        })
+
+    if os.path.exists(PUBLIC_INDEX_PATH):
+        print(f"Merging into existing public index...")
+        vectorstore = FAISS.load_local(
+            PUBLIC_INDEX_PATH,
+            getembeddings(),
+            allow_dangerous_deserialization=True
+        )
+        new_vectorstore = FAISS.from_documents(chunks, getembeddings())
+        vectorstore.merge_from(new_vectorstore)
+    else:
+        print(f"Creating new public index...")
+        vectorstore = FAISS.from_documents(chunks, getembeddings())
+
+    vectorstore.save_local(PUBLIC_INDEX_PATH)
+    print(f"Public index updated — document {document.id} ({len(chunks)} chunks added)")

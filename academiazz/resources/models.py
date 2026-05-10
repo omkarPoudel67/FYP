@@ -30,3 +30,24 @@ class Resource(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.module.code})"
+
+class PublicDocument(models.Model):
+    DOCUMENT_TYPES = [
+        ('enrollment',   'Enrollment'),
+        ('courses',      'Courses'),
+        ('location',     'Location'),
+        ('fees',         'Fees'),
+        ('requirements', 'Entry Requirements'),
+        ('faq',          'FAQ'),
+        ('general',      'General'),
+    ]
+
+    file        = models.FileField(upload_to='public/pdfs/')
+    title       = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, blank=True)
+    type        = models.CharField(max_length=20, choices=DOCUMENT_TYPES, default='general')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    is_active   = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.get_type_display()})"

@@ -11,12 +11,11 @@ from authentication.models import User
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-
-# Create your views here.
-
-
+from authentication.decorators import IsTeacher, IsStudent
+from rest_framework.decorators import permission_classes
 
 @api_view(["POST"])
+@permission_classes([IsStudent])
 def get_student_data(request):
     if request.method == 'POST':
         student = Students.objects.get(user=request.user)

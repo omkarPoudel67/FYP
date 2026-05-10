@@ -1,0 +1,6 @@
+docx2txt==0.9
+faiss-cpu==1.13.2
+regex==2026.4.4
+safetensors==0.7.0
+sentence-transformers==5.3.0
+transformers==5.5.0

@@ -8,7 +8,8 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, UnstructuredWordDocumentLoader
-from retrival import retrieve_public_context
+from .retrieval import retrieve_public_context
+from .embeddings import getembeddings
 
 
 load_dotenv()
@@ -22,8 +23,7 @@ PUBLIC_INDEX_PATH = os.path.join(FAISS_DIR, "public_knowledge")
 os.makedirs(MODULES_DIR, exist_ok=True)
 
 
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-embeddings = None
+
 _llm = None
 
 
@@ -39,13 +39,7 @@ def get_loader(file_path: str):
     else:
         raise ValueError(f"Unsupported file type: {ext}")
 
-def getembeddings():
-    global embeddings
-    if embeddings is None:
-        print("Loading embedding model...")
-        embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
-        print("Embedding model loaded")
-    return embeddings
+
 
 def get_llm():
     global _llm

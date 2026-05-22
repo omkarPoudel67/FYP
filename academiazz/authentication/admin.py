@@ -38,7 +38,7 @@ Login Details:
 
 Please log in and change your password after first login.
 
-Welcome aboard! 😊
+Welcome aboard! 
 """,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
@@ -50,7 +50,41 @@ Welcome aboard! 😊
 class CustomTeachersAdmin(admin.ModelAdmin):
     form = TeacherCreateForm
     list_display = ('user', 'role')
-    search_fields = ('user__username',)
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email')
+    list_filter = ('role',)
+
+    def save_model(self, request, obj, form, change):
+        is_new = obj.pk is None
+        raw_password = form.cleaned_data.get("password")
+        super().save_model(request, obj, form, change)
+
+        if is_new:
+            user = obj.user
+            print("DEBUG: Sending email to", user.email)
+
+            send_mail(
+                subject="Your Teacher Account Has Been Created",
+                message=f"""
+Hi {user.first_name} {user.last_name},
+
+Your teacher account has been created successfully.
+
+Login Details:
+- Username: {user.username}
+- Password: {raw_password}
+- Teacher ID: {user.id}
+- Role: {obj.role}
+
+Please log in and change your password after first login.
+
+Welcome aboard!
+""",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+            print("DEBUG: Email sent successfully")
+
 
 # Register admin
 admin.site.register(Students, CustomStudentsAdmin)

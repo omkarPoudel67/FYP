@@ -11,10 +11,10 @@ from .rag.agent import build_agent
 
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
-from .rag.indexer import embeddings
-from rag.retrival import retrieve_public_context
+from .rag.embeddings import getembeddings
+from .rag.retrieval import retrieve_public_context
 
-print (embeddings == None) 
+
 
 
 class ChatbotView(APIView):

@@ -85,58 +85,59 @@ Welcome aboard! 😊
         return student
         
 
-
 class TeacherCreateForm(forms.ModelForm):
-    username = forms.CharField(max_length=150, required=True)
-    first_name = forms.CharField(max_length=30, required=True)
-    last_name = forms.CharField(max_length=50, required=True)
-    email = forms.EmailField(required=True)
-    password = forms.CharField(widget=forms.PasswordInput, required=True)
-    phonenumber = forms.CharField(max_length=10, required=True)
+    username = forms.CharField()
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    email = forms.EmailField()
+    password = forms.CharField(
+        widget=forms.PasswordInput,
+        required=False,  # Not required on edit
+        help_text="Leave blank to keep the existing password."
+    )
+    phone_number = forms.CharField(required=False)
 
     class Meta:
         model = Teachers
-        fields = []
+        fields = ['role']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # If editing an existing teacher, pre-fill user fields
+        if self.instance and self.instance.pk:
+            user = self.instance.user
+            self.fields['username'].initial = user.username
+            self.fields['first_name'].initial = user.first_name
+            self.fields['last_name'].initial = user.last_name
+            self.fields['email'].initial = user.email
+            self.fields['phone_number'].initial = user.phone_number
 
     def save(self, commit=True):
-        # Create user first
-        user = User.objects.create_user(
-            username=self.cleaned_data['username'],
-            first_name=self.cleaned_data['first_name'],
-            last_name=self.cleaned_data['last_name'],
-            email=self.cleaned_data['email'],
-            password=self.cleaned_data['password'],
-            phone_number=self.cleaned_data['phonenumber']
-        )
-
-        # Create teacher object
         teacher = super().save(commit=False)
-        teacher.user = user
-        teacher.role = 'teacher'
+
+        if teacher.pk:
+            user = teacher.user
+        else:
+            user = User()
+
+        user.username = self.cleaned_data['username']
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.email = self.cleaned_data['email']
+        user.phone_number = self.cleaned_data.get('phone_number', '')
+        user.role = 'teacher'  # always sync role to User model
+
+        if teacher.role == 'admin':
+            user.is_superuser = True
+            user.is_staff = True
+
+        raw_password = self.cleaned_data.get('password')
+        if raw_password:
+            user.set_password(raw_password)
 
         if commit:
+            user.save()
+            teacher.user = user
             teacher.save()
-        
-            subject = "Your Student Account has been Created!"
-            message = f"""
-Hi {user.first_name} {user.last_name},
-Your teacher/admin account has been successfully created.
-
-Here are your login details:
-- Username: {user.username}
-- Teacher id:{user.id}
-- Password: {self.cleaned_data['password']}
-- Role: {teacher.role.capitalize()}
-
-You can now log in to the system and manage your classes. Welcome aboard! 😊
-"""
-            send_mail(
-                subject,
-                message,
-                'omkarpoudel06@gmail.com',  
-                [user.email],                 
-                fail_silently=False,
-            )
-
 
         return teacher

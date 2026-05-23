@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import "./StudentAttendance.css";
+import Sidebar from "./components/Sidebar";
+import "./CSS/StudentAttendance.css";
 import {
   LineChart, Line, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer,

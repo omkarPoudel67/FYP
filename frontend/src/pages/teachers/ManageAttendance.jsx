@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import "./ManageAttendance.css";
+import Sidebar from "./components/Sidebar";
+import "./CSS/ManageAttendance.css";
 
 const API_BASE = "http://localhost:8000";
 const SEMESTERS = [1,2,3,4,5,6];

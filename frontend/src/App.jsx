@@ -23,7 +23,7 @@ import ManageAnnouncements from './pages/teachers/ManageAnnouncements';
 import ManageSchedules from './pages/teachers/ManageSchedules';
 import ManageResources from './pages/teachers/ManageResources';
 import ManageProfile from './pages/teachers/ManageProfile';
-import StudentAttendance   from './teacher/StudentAttendance';
+import StudentAttendance   from './pages/teachers/StudentAttendance';
 
 
 function App() {

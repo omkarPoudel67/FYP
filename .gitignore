@@ -1,7 +1,10 @@
 # Python
 venv/
 
-academiazz/chatbot/
+
+
+academiazz/vars
+academiazz/.env/
 
 # Node / React
 frontend/node_modules/

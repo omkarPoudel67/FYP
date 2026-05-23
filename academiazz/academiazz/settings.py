@@ -18,6 +18,8 @@ from celery.schedules import crontab
 from pathlib import Path
 from datetime import timedelta
 from corsheaders.defaults import default_headers
+from dotenv import load_dotenv
+load_dotenv("../vars/.env") 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -186,13 +188,13 @@ SIMPLE_JWT = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'omkarpoudel06@gmail.com'
-EMAIL_HOST_PASSWORD = 'tlhu rmwb xjel xfzu' 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-TIME_ZONE = 'Asia/Kathmandu'
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT'))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS') 
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+TIME_ZONE = os.environ.get('TIME_ZONE')
 USE_TZ = True
 
 MEDIA_URL = '/media/'

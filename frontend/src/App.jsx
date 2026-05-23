@@ -24,7 +24,7 @@ import ManageSchedules from './pages/teachers/ManageSchedules';
 import ManageResources from './pages/teachers/ManageResources';
 import ManageProfile from './pages/teachers/ManageProfile';
 import StudentAttendance   from './pages/teachers/StudentAttendance';
-
+import ManageModules from './pages/teachers/ManageModules';
 
 function App() {
   return (
@@ -53,6 +53,7 @@ function App() {
         <Route path="/teacher/resources" element={<ManageResources />} />
         <Route path="/teacher/profile" element={<ManageProfile />} />
         <Route path="/teacher/attendance/:studentId"   element={<StudentAttendance />} />
+        <Route path="/teacher/modules" element={<ManageModules />} />
       </Routes>
     </Router>
   );

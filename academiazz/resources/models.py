@@ -2,12 +2,27 @@ from django.db import models
 from django.conf import settings
 
 class Module(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    code = models.CharField(max_length=20, unique=True)
+    YEAR_CHOICES = [
+        (1, 'Year 1'),
+        (2, 'Year 2'),
+        (3, 'Year 3'),
+    ]
+    SEMESTER_CHOICES = [
+        (1, 'Semester 1'),
+        (2, 'Semester 2'),
+        (3, 'Semester 3'),
+        (4, 'Semester 4'),
+        (5, 'Semester 5'),
+        (6, 'Semester 6'),
+    ]
+
+    name     = models.CharField(max_length=255, unique=True)
+    code     = models.CharField(max_length=20, unique=True)
+    year     = models.IntegerField(choices=YEAR_CHOICES, default=1)
+    semester = models.IntegerField(choices=SEMESTER_CHOICES, default=1)
 
     def __str__(self):
         return f"{self.code} - {self.name}"
-
 
 class Resource(models.Model):
     SESSION_TYPES = [

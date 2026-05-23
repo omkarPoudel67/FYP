@@ -18,7 +18,7 @@ from .utils import send_student_welcome_email
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from schedules.models import Group
-
+from django.db.models import Q
 
 
 @api_view(["POST"])

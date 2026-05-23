@@ -3,8 +3,19 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Schedule, Group
-from .serializers import ScheduleSerializer
+from .serializers import ScheduleSerializer, GroupSerializer
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.permissions import AllowAny
 
+class GroupAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        groups = Group.objects.all().order_by('name')
+        serializer = GroupSerializer(groups, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
 @api_view(["GET"])
 def get_schedules(request):
     group_id = request.query_params.get("group")

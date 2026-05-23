@@ -23,6 +23,8 @@ import ManageAnnouncements from './pages/teachers/ManageAnnouncements';
 import ManageSchedules from './pages/teachers/ManageSchedules';
 import ManageResources from './pages/teachers/ManageResources';
 import ManageProfile from './pages/teachers/ManageProfile';
+import StudentAttendance   from './teacher/StudentAttendance';
+
 
 function App() {
   return (
@@ -50,6 +52,7 @@ function App() {
         <Route path="/teacher/schedules" element={<ManageSchedules />} />
         <Route path="/teacher/resources" element={<ManageResources />} />
         <Route path="/teacher/profile" element={<ManageProfile />} />
+        <Route path="/teacher/attendance/:studentId"   element={<StudentAttendance />} />
       </Routes>
     </Router>
   );

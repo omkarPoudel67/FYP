@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../context/authcontext";
 import "../CSS/Sidebar.css";
 
@@ -37,6 +37,8 @@ const NAV_ITEMS = [
         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
       </svg>
     ),
+    // also active on student detail pages
+    activeOn: ["/teacher/attendance"],
   },
   {
     to: "/teacher/announcements",
@@ -59,6 +61,8 @@ const NAV_ITEMS = [
         <line x1="3" y1="10" x2="21" y2="10" />
       </svg>
     ),
+    // stay active when inside a group schedule
+    activeOn: ["/teacher/schedules", "/teacher/groups/"],
   },
   {
     to: "/teacher/resources",
@@ -74,15 +78,28 @@ const NAV_ITEMS = [
     ),
   },
   {
-  to: "/teacher/modules",
-  label: "Modules",
-  icon: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="3" y="3" width="18" height="7" rx="1" />
-      <rect x="3" y="14" width="18" height="7" rx="1" />
-    </svg>
-  ),
-},
+    to: "/teacher/modules",
+    label: "Modules",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="3" y="3" width="18" height="7" rx="1" />
+        <rect x="3" y="14" width="18" height="7" rx="1" />
+      </svg>
+    ),
+  },
+  {
+    to: "/teacher/groups",
+    label: "Groups",
+    end: true,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+  },
   {
     to: "/teacher/teachers",
     label: "Teachers",
@@ -109,7 +126,8 @@ const NAV_ITEMS = [
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { setAccessToken } = useAuth();
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const location  = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -122,6 +140,20 @@ export default function Sidebar() {
     navigate("/login");
   };
 
+  const isItemActive = (item) => {
+    const path = location.pathname;
+    // if item has explicit activeOn paths, use those
+    if (item.activeOn) {
+      return item.activeOn.some(p => path.startsWith(p));
+    }
+    // if end is set, exact match only
+    if (item.end) {
+      return path === item.to;
+    }
+    // default: startsWith
+    return path.startsWith(item.to);
+  };
+
   return (
     <aside className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`}>
       {/* Header */}
@@ -132,35 +164,32 @@ export default function Sidebar() {
         </div>
         <button
           className="sidebar__toggle"
-          onClick={() => setCollapsed((c) => !c)}
+          onClick={() => setCollapsed(c => !c)}
           aria-label="Toggle sidebar"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            {collapsed ? (
-              <path d="M9 18l6-6-6-6" />
-            ) : (
-              <path d="M15 18l-6-6 6-6" />
-            )}
+            {collapsed ? <path d="M9 18l6-6-6-6" /> : <path d="M15 18l-6-6 6-6" />}
           </svg>
         </button>
       </div>
 
       {/* Nav */}
-        <nav className="sidebar__nav">
-        {NAV_ITEMS.map((item) => (
+      <nav className="sidebar__nav">
+        {NAV_ITEMS.map(item => {
+          const active = isItemActive(item);
+          return (
             <NavLink
-            key={item.to}
-            to={item.to}
-            data-label={item.label}
-            className={({ isActive }) =>
-                `sidebar__link ${isActive ? "sidebar__link--active" : ""}`
-            }
+              key={item.to}
+              to={item.to}
+              data-label={item.label}
+              className={`sidebar__link ${active ? "sidebar__link--active" : ""}`}
             >
-            <span className="sidebar__icon">{item.icon}</span>
-            {!collapsed && <span className="sidebar__label">{item.label}</span>}
+              <span className="sidebar__icon">{item.icon}</span>
+              {!collapsed && <span className="sidebar__label">{item.label}</span>}
             </NavLink>
-        ))}
-        </nav>
+          );
+        })}
+      </nav>
 
       {/* Logout */}
       <div className="sidebar__footer">

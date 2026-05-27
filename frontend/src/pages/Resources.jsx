@@ -14,7 +14,7 @@ const Resources = () => {
     modules,
     loading: modulesLoading,
     error: modulesError,
-  } = useModules(studentData?.group);
+  } = useModules(studentData?.group?.id || studentData?.group);
 
   const {
     weeks,

@@ -34,7 +34,7 @@ const Schedule = () => {
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <div className="group-badge">
               <span className="group-indicator"></span>
-              <strong>Group:</strong> {studentData.group}
+              <strong>Group:</strong> {studentData.group?.name || studentData.group}
             </div>
             <div className="class-count">
               {schedules.length} {schedules.length === 1 ? "class" : "classes"} scheduled
@@ -85,7 +85,7 @@ const Schedule = () => {
                       {/* <div className="module-icon">
                         {sch.module[0]}
                       </div> */}
-                      {sch.module}
+                      {sch.module?.name || sch.module}
                     </div>
                   </td>
                   <td className="table-cell">
@@ -114,7 +114,7 @@ const Schedule = () => {
                       {/* <div className="teacher-avatar">
                         {sch.teacher_name.charAt(0)}
                       </div> */}
-                      <span>{sch.teacher_name}</span>
+                      <span>{sch.teacher_name?.name || sch.teacher_name}</span>
                     </div>
                   </td>
                   <td className="table-cell description-cell">

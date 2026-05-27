@@ -172,6 +172,22 @@ class TeacherUpdateSerializer(serializers.Serializer):
     phone      = serializers.CharField(required=False, allow_blank=True)
     password   = serializers.CharField(write_only=True, min_length=6, required=False, allow_blank=True)
 
+    def update(self, validated_data):
+        user = self.teacher_instance.user
+
+        user.username     = validated_data.get("username",     user.username)
+        user.first_name   = validated_data.get("first_name",   user.first_name)
+        user.last_name    = validated_data.get("last_name",    user.last_name)
+        user.email        = validated_data.get("email",        user.email)
+        user.phone_number = validated_data.get("phone",        user.phone_number)
+
+        new_password = validated_data.get("password", "")
+        if new_password:
+            user.set_password(new_password)
+
+        user.save()
+        return self.teacher_instance
+
     def __init__(self, *args, **kwargs):
         self.teacher_instance = kwargs.pop("teacher_instance")
         super().__init__(*args, **kwargs)

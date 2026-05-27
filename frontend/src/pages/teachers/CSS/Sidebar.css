@@ -270,3 +270,64 @@
 .teacher-layout--collapsed .teacher-layout__content {
   margin-left: var(--sb-width-collapsed);
 }
+
+/* ── Confirm logout ────────────────────────────────────────── */
+.sidebar__confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: var(--sb-radius);
+  background: rgba(239, 68, 68, 0.07);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.sidebar__confirm--collapsed {
+  justify-content: center;
+  padding: 6px;
+}
+
+.sidebar__confirm-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #f87171;
+  flex: 1;
+  white-space: nowrap;
+}
+
+.sidebar__confirm-yes,
+.sidebar__confirm-no {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: none;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 160ms ease;
+}
+
+.sidebar__confirm-yes svg,
+.sidebar__confirm-no svg {
+  width: 13px;
+  height: 13px;
+}
+
+.sidebar__confirm-yes {
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+}
+
+.sidebar__confirm-yes:hover {
+  background: rgba(52, 211, 153, 0.22);
+}
+
+.sidebar__confirm-no {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+.sidebar__confirm-no:hover {
+  background: rgba(239, 68, 68, 0.22);
+}

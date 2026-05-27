@@ -16,7 +16,7 @@ import jwt
 from .models import User
 import datetime
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import permission_classes
+from rest_framework.decorators import permission_classes, authentication_classes
 from django.views.decorators.csrf import csrf_exempt
 from .decorators import IsStudent, IsTeacher
 
@@ -53,11 +53,11 @@ from .decorators import IsStudent, IsTeacher
     # except InvalidTokenError:
     #     return JsonResponse({"error": "Unidentified/invalid token"}, status = 401)
 
-@csrf_exempt
+@api_view(['POST'])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def refresh_access_token(request):
     refresh_token = request.COOKIES.get("refresh_token")
-
     if not refresh_token:
         return JsonResponse({"error": "Refresh token not found"}, status = 401)
     

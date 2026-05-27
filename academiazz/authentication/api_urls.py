@@ -17,5 +17,5 @@ urlpatterns = [
     path('test/', test_view, name='test_view'),
     path('refresh-access-token/', refresh_access_token, name ='refresh_access_token'),
     path('logout/', logout_api, name = 'logout')
-  #  path('', include(router.urls)), 
+  # path('', include(router.urls)), 
 ]

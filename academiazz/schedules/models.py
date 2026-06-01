@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from resources.models import Module
 from django.core.exceptions import ValidationError
+from teachers.models  import Teachers
 
 User = get_user_model()
 
@@ -38,7 +39,7 @@ class Schedule(models.Model):
     module     = models.ForeignKey("resources.Module", on_delete=models.CASCADE)
     group      = models.ForeignKey(Group, on_delete=models.CASCADE)
     class_type = models.CharField(max_length=20, choices=CLASS_TYPES)
-    teacher    = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    teacher    = models.ForeignKey(Teachers, on_delete=models.SET_NULL, null=True, blank=True)
     day        = models.CharField(max_length=3, choices=CLASS_DAYS, default=None)
     start_time = models.TimeField()
     end_time   = models.TimeField()

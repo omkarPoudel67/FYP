@@ -1,4 +1,4 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .models import Resource
 from .serializers import ResourceSerializer, ModuleSerializer, CreateResourceSerializer, UpdateResourceSerializer, ModuleCreateUpdateSerializer
@@ -8,9 +8,11 @@ import os
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from authentication.decorators import IsStudent, IsTeacher
+
 
 from .serializers import (
     ResourceDetailSerializer,
@@ -20,7 +22,7 @@ from .serializers import (
 )
 
 class ModuleListAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsTeacher]  # Only teachers can manage modules
 
     # GET /modules/info/ — list all
     def get(self, request, pk=None):
@@ -47,7 +49,7 @@ class ModuleListAPIView(APIView):
         if pk is None:
             return Response({"error": "Module ID is required."}, status=status.HTTP_400_BAD_REQUEST)
         module = get_object_or_404(Module, pk=pk)
-        serializer = ModuleCreateUpdateSerializer(module, data=request.data)
+        serializer = ModuleCreateUpdateSerializer(module, data=request.data, partial=True)
         if serializer.is_valid():
             updated = serializer.save()
             return Response(
@@ -73,7 +75,7 @@ class ResourceAPIView(APIView):
     PATCH  resources/info/<pk>/     — partial update (multipart/form-data)
     DELETE resources/info/<pk>/     — delete
     """
-    permission_classes = [AllowAny]  # swap with teacher decorator later
+    permission_classes = [IsAuthenticated, IsTeacher]  # Only teachers can manage resources
 
     # ── GET ──────────────────────────────────────────────────────────
     def get(self, request, pk=None):
@@ -184,6 +186,7 @@ class ResourceAPIView(APIView):
         return "Unknown"
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated, IsStudent])  # Both students and teachers can view modules/weeks/resources
 def get_modules(request):
     group_id = request.query_params.get("group_id")  # Get group ID from query string
     if not group_id:
@@ -201,6 +204,7 @@ def get_modules(request):
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated, IsStudent])  # Both students and teachers can view modules/weeks/resources
 def get_weeks(request):
     module_name = request.query_params.get("module")  # module name from query params
     if not module_name:
@@ -219,6 +223,7 @@ def get_weeks(request):
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated, IsStudent])  # Both students and teachers can view modules/weeks/resources
 def get_resources(request):
     module_name = request.query_params.get("module")
     week = request.query_params.get("week")
@@ -242,7 +247,6 @@ def get_resources(request):
 
 
 def download_resource(request, filename):
-    
     file_path = os.path.join(settings.MEDIA_ROOT, "resources/pdfs", filename)
     print(file_path)
     if os.path.exists(file_path):

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import StudentCreateForm, TeacherCreateForm, LoginUserForm
+# from .forms import StudentCreateForm, TeacherCreateForm, LoginUserForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 import random
@@ -21,67 +21,67 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 
-# Create your views here.
-def login_view(request):
-    if request.method == 'POST':
-        form = LoginUserForm(request.POST)
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+# # Create your views here.
+# def login_view(request):
+#     if request.method == 'POST':
+#         form = LoginUserForm(request.POST)
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
 
-        user = authenticate(request, username=username, password=password)
+#         user = authenticate(request, username=username, password=password)
 
-        if user is not None:
-            login(request, user)
-            messages.success(request, f'Welcome{user.username}!')
-            if hasattr(user, 'Students'):
-                return redirect('sudent_dashboardt')
+#         if user is not None:
+#             login(request, user)
+#             messages.success(request, f'Welcome{user.username}!')
+#             if hasattr(user, 'Students'):
+#                 return redirect('sudent_dashboardt')
             
-            elif hasattr(user, 'teachers'):
-                return redirect('teacher_dashboard')
+#             elif hasattr(user, 'teachers'):
+#                 return redirect('teacher_dashboard')
             
-            else:
-                pass
-        else:
-            messages.error(request, "Invalid username or password")
-    else:
-        form = LoginUserForm()
+#             else:
+#                 pass
+#         else:
+#             messages.error(request, "Invalid username or password")
+#     else:
+#         form = LoginUserForm()
 
                              
 
-def create_student(request):
-    if request.method == 'POST':
-        form = StudentCreateForm(request.POST)
-        if form.is_valid():
-            student = form.save()
-            messages.success(request, f'Student {student.user.username} created successfully')
-        return redirect('dashboard')
-    else:
-        form = StudentCreateForm()
+# def create_student(request):
+#     if request.method == 'POST':
+#         form = StudentCreateForm(request.POST)
+#         if form.is_valid():
+#             student = form.save()
+#             messages.success(request, f'Student {student.user.username} created successfully')
+#         return redirect('dashboard')
+#     else:
+#         form = StudentCreateForm()
     
-    return render(request,'auuthentication/create_student.html',{'form':form})
+#     return render(request,'auuthentication/create_student.html',{'form':form})
 
 
-def create_teacher(request):
-    if request.method == 'POST':
-        form = TeacherCreateForm(request.POST)
+# def create_teacher(request):
+#     if request.method == 'POST':
+#         form = TeacherCreateForm(request.POST)
 
-        if form.is_valid():
-            teacher = form.save()
+#         if form.is_valid():
+#             teacher = form.save()
 
-            messages.success(request,f'Teacher {teacher.user.username} created successfully!')
+#             messages.success(request,f'Teacher {teacher.user.username} created successfully!')
 
-            return redirect('teacher_list')
-    else:
-        form =TeacherCreateForm()
-    return render(request, 'authentication/create_teacher.html',{'form':form})
+#             return redirect('teacher_list')
+#     else:
+#         form =TeacherCreateForm()
+#     return render(request, 'authentication/create_teacher.html',{'form':form})
 
-@login_required
-def student_dashboard(request):
-    return render(request, 'dashboards/student_dashboard.html')
+# @login_required
+# def student_dashboard(request):
+#     return render(request, 'dashboards/student_dashboard.html')
 
-@login_required
-def teacher_dashboard(request):
-    return render(request, 'dashboards/teacher_dashboard.html')
+# @login_required
+# def teacher_dashboard(request):
+#     return render(request, 'dashboards/teacher_dashboard.html')
 
 @csrf_exempt
 def forgot_password(request):
@@ -149,13 +149,13 @@ def reset_password(request):
     return Response({"success": "Password reset successful"})
 
 
-def test_view(request):
-    """
-    Simple test view to verify API is working
-    """
-    return HttpResponse({
-        "message": "Test view is working!",
-        "method": request.method,
-        "success": True
-    })
+# def test_view(request):
+#     """
+#     Simple test view to verify API is working
+#     """
+#     return HttpResponse({
+#         "message": "Test view is working!",
+#         "method": request.method,
+#         "success": True
+#     })
 

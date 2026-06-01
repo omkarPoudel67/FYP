@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import Sidebar from "./components/Sidebar";
 import "./CSS/ManageResources.css";
+import { useAuth } from "../../context/authcontext";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE  = "http://localhost:8000";
 const WEEKS     = Array.from({ length: 11 }, (_, i) => i + 1);
@@ -18,6 +20,8 @@ const emptyForm = {
 };
 
 export default function ManageResources() {
+  const navigate = useNavigate();
+  const { accessToken } = useAuth();
   const [resources, setResources] = useState([]);
   const [modules,   setModules]   = useState([]);
   const [loading,   setLoading]   = useState(true);
@@ -36,6 +40,10 @@ export default function ManageResources() {
   const [toast,        setToast]      = useState(null);
   const [autoYear,     setAutoYear]   = useState(null);
   const [autoSemester, setAutoSemester] = useState(null);
+  const guardRes = (res) => {
+  if (res.status === 403) { navigate("/unauthorized"); return false; }
+  return true;
+};
 
   const fetchResources = async () => {
     setLoading(true);
@@ -47,7 +55,8 @@ export default function ManageResources() {
       if (filters.semester) params.append("semester", filters.semester);
       if (filters.type)     params.append("type",     filters.type);
       if (filters.search)   params.append("search",   filters.search);
-      const res  = await fetch(`${API_BASE}/resources/resources/info/?${params}`);
+      const res  = await fetch(`${API_BASE}/resources/resources/info/?${params}`,{ headers: { "Authorization": `Bearer ${accessToken}` } });
+      if (!guardRes(res)) return;
       const data = await res.json();
       setResources(Array.isArray(data) ? data : []);
     } catch {
@@ -59,14 +68,15 @@ export default function ManageResources() {
 
   const fetchModules = async () => {
     try {
-      const res  = await fetch(`${API_BASE}/resources/modules/info/`);
+      const res  = await fetch(`${API_BASE}/resources/modules/info/`, { headers: { "Authorization": `Bearer ${accessToken}` } });
+      if (!guardRes(res)) return;
       const data = await res.json();
       setModules(Array.isArray(data) ? data : []);
     } catch {}
   };
 
-  useEffect(() => { fetchModules(); }, []);
-  useEffect(() => { fetchResources(); }, [filters]);
+  useEffect(() => { if (!accessToken) return; fetchModules(); }, [accessToken]);
+  useEffect(() => { if (!accessToken) return; fetchResources(); }, [filters, accessToken]);
 
   const filterModuleObj = modules.find(m => String(m.id) === String(filters.module));
   const moduleFiltered  = filters.module !== "";
@@ -157,7 +167,9 @@ export default function ManageResources() {
       const res  = await fetch(`${API_BASE}/resources/resources/info/`, {
         method: "POST",
         body:   fd,
+        headers: { "Authorization": `Bearer ${accessToken}` }
       });
+      if (!guardRes(res)) return;
       const data = await res.json();
       if (res.ok) {
         showToast(data.message || "Resource uploaded.");
@@ -186,7 +198,9 @@ export default function ManageResources() {
       const res  = await fetch(`${API_BASE}/resources/resources/info/${selected.id}/`, {
         method: "PATCH",
         body:   fd,
+        headers: { "Authorization": `Bearer ${accessToken}` }
       });
+      if (!guardRes(res)) return;
       const data = await res.json();
       if (res.ok) {
         showToast("Resource updated.");
@@ -207,7 +221,9 @@ export default function ManageResources() {
     try {
       const res = await fetch(`${API_BASE}/resources/resources/info/${selected.id}/`, {
         method: "DELETE",
+        headers: { "Authorization": `Bearer ${accessToken}` }
       });
+      if (!guardRes(res)) return;
       if (res.ok) {
         showToast("Resource deleted.");
         closeModal();

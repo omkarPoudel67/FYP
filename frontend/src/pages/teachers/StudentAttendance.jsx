@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import "./CSS/StudentAttendance.css";
+import { useAuth } from "../../context/authcontext";
 import {
   LineChart, Line, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer,
@@ -15,6 +16,9 @@ import {
 const API_BASE = "http://localhost:8000";
 
 export default function StudentAttendance() {
+  const [openDropdown, setOpenDropdown] = useState(null); // holds attendance_id
+  const [updatingId, setUpdatingId] = useState(null);
+  const { accessToken } = useAuth();
   const { studentId } = useParams();
   const navigate      = useNavigate();
 
@@ -25,12 +29,24 @@ export default function StudentAttendance() {
   // filters for history list
   const [selectedModule, setSelectedModule] = useState("All");
   const [selectedDate,   setSelectedDate]   = useState("");
+  const guardRes = (res) => {
+  if (res.status === 403) { navigate("/unauthorized"); return false; }
+  return true;
+};
+useEffect(() => {
+  const close = () => setOpenDropdown(null);
+  document.addEventListener("click", close);
+  return () => document.removeEventListener("click", close);
+}, []);
 
   useEffect(() => {
     const fetchDetail = async () => {
       setLoading(true); setError(null);
       try {
-        const res  = await fetch(`${API_BASE}/attendance/info/${studentId}/`);
+        const res  = await fetch(`${API_BASE}/attendance/info/${studentId}/`, {
+          headers: { "Authorization": `Bearer ${accessToken}` }
+        });
+        if (!guardRes(res)) return;
         const json = await res.json();
         setData(json);
       } catch {
@@ -40,7 +56,7 @@ export default function StudentAttendance() {
       }
     };
     fetchDetail();
-  }, [studentId]);
+  }, [studentId, accessToken]);
 
   if (loading) return (
     <div className="teacher-layout">
@@ -61,6 +77,35 @@ export default function StudentAttendance() {
   );
 
   const { student, stats, insights, module_breakdown, chart_records, history, module_names } = data;
+  const updateAttendanceStatus = async (attendanceId, newStatus) => {
+  setUpdatingId(attendanceId);
+  try {
+    const res = await fetch(`${API_BASE}/attendance/info/${attendanceId}/update/`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      
+      body: JSON.stringify({ status: newStatus }),
+    });
+    if (!guardRes(res)) return;
+    if (!res.ok) throw new Error("Failed");
+
+    // optimistically update local state
+    setData(prev => ({
+      ...prev,
+      history: prev.history.map(r =>
+        r.id === attendanceId ? { ...r, status: newStatus } : r
+      ),
+    }));
+  } catch {
+    alert("Failed to update attendance.");
+  } finally {
+    setUpdatingId(null);
+    setOpenDropdown(null);
+  }
+};
 
   // ── Chart data ─────────────────────────────────────────────────
   const buildChartData = () => {
@@ -316,14 +361,42 @@ export default function StudentAttendance() {
                   </div>
                   <div className="sa-record-right">
                     <span className="sa-record-date">{r.date}</span>
-                    <span className={`sa-status-badge sa-status-badge--${r.status}`}>
-                      {r.status === "present"
-                        ? <CheckCheck size={12} />
-                        : r.status === "late"
-                        ? <Clock size={12} />
-                        : <X size={12} />}
-                      {r.status.charAt(0).toUpperCase() + r.status.slice(1)}
-                    </span>
+                    <div style={{ position: "relative" }}>
+  <span
+    className={`sa-status-badge sa-status-badge--${r.status}`}
+    style={{ cursor: "pointer" }}
+    onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === r.id ? null : r.id); }}
+  >
+    {r.status === "present" ? <CheckCheck size={12} /> : r.status === "late" ? <Clock size={12} /> : <X size={12} />}
+    {r.status.charAt(0).toUpperCase() + r.status.slice(1)}
+  </span>
+
+  {openDropdown === r.id && (
+    <div style={{
+      position: "absolute", right: 0, top: "110%",
+      background: "#111520", border: "1px solid rgba(255,255,255,0.1)",
+      borderRadius: "8px", zIndex: 50, minWidth: "110px", overflow: "hidden",
+    }}>
+      {["present", "absent", "late"]
+        .filter(s => s !== r.status)
+        .map(s => (
+          <div
+            key={s}
+            onClick={() => updateAttendanceStatus(r.id, s)}
+            style={{
+              padding: "8px 14px", cursor: "pointer", fontSize: "13px",
+              color: s === "present" ? "#4ade80" : s === "late" ? "#facc15" : "#f87171",
+              opacity: updatingId === r.id ? 0.5 : 1,
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
+            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+          >
+            {s.charAt(0).toUpperCase() + s.slice(1)}
+          </div>
+        ))}
+    </div>
+  )}
+</div>
                   </div>
                 </div>
               ))

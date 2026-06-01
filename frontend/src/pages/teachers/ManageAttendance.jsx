@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import "./CSS/ManageAttendance.css";
+import { useAuth } from "../../context/authcontext";
 
 const API_BASE = "http://localhost:8000";
 const SEMESTERS = [1,2,3,4,5,6];
 const YEARS     = [1,2,3];
 
 export default function ManageAttendance() {
+  const { accessToken } = useAuth();
   const navigate = useNavigate();
 
   const [students, setStudents] = useState([]);
@@ -18,6 +20,10 @@ export default function ManageAttendance() {
   const [filters, setFilters] = useState({
     semester: "", year: "", group: "", search: "",
   });
+  const guardRes = (res) => {
+  if (res.status === 403) { navigate("/unauthorized"); return false; }
+  return true;
+};
 
   const fetchStudents = async () => {
     setLoading(true); setError(null);
@@ -28,7 +34,10 @@ export default function ManageAttendance() {
       if (filters.group)    params.append("group",    filters.group);
       if (filters.search)   params.append("search",   filters.search);
 
-      const res  = await fetch(`${API_BASE}/attendance/info/?${params}`);
+      const res  = await fetch(`${API_BASE}/attendance/info/?${params}`, {
+        headers: { "Authorization": `Bearer ${accessToken}` }
+      });
+      if (!guardRes(res)) return;
       const data = await res.json();
       setStudents(data);
     } catch {
@@ -40,14 +49,17 @@ export default function ManageAttendance() {
 
   const fetchGroups = async () => {
     try {
-      const res  = await fetch(`${API_BASE}/api/groups/`);
+      const res  = await fetch(`${API_BASE}/api/groups/`, {
+        headers: { "Authorization": `Bearer ${accessToken}` }
+      });
+      if (!guardRes(res)) return;
       const data = await res.json();
       setGroups(data);
     } catch {}
   };
 
-  useEffect(() => { fetchGroups(); }, []);
-  useEffect(() => { fetchStudents(); }, [filters]);
+  useEffect(() => { if (!accessToken) return; fetchGroups(); }, [accessToken]);
+  useEffect(() => { if (!accessToken) return; fetchStudents(); }, [filters, accessToken]);
 
   const getPctColor = (pct) => {
     if (pct >= 90) return "var(--pct-high)";

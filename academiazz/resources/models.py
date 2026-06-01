@@ -1,5 +1,8 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
+
+
 
 class Module(models.Model):
     YEAR_CHOICES = [
@@ -7,6 +10,7 @@ class Module(models.Model):
         (2, 'Year 2'),
         (3, 'Year 3'),
     ]
+
     SEMESTER_CHOICES = [
         (1, 'Semester 1'),
         (2, 'Semester 2'),
@@ -16,10 +20,28 @@ class Module(models.Model):
         (6, 'Semester 6'),
     ]
 
-    name     = models.CharField(max_length=255, unique=True)
-    code     = models.CharField(max_length=20, unique=True)
-    year     = models.IntegerField(choices=YEAR_CHOICES, default=1)
+    name = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=20, unique=True)
+    year = models.IntegerField(choices=YEAR_CHOICES, default=1)
     semester = models.IntegerField(choices=SEMESTER_CHOICES, default=1)
+
+    def clean(self):
+        semester_modules = Module.objects.filter(
+            semester=self.semester
+        )
+
+        
+        if self.pk:
+            semester_modules = semester_modules.exclude(pk=self.pk)
+
+        if semester_modules.count() >= 6:
+            raise ValidationError({
+                "semester": f"Semester {self.semester} already has 6 modules."
+            })
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # automatically runs clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.code} - {self.name}"

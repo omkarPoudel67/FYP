@@ -43,9 +43,9 @@ export default function Login() {
       
       if (data.role === "student") {
         api.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
-        navigate("/student-dashboard", { state: { username: data.username } });
+        navigate("/", { state: { username: data.username } });
       } else if (data.role === "teacher") {
-        navigate("/teacher-dashboard");
+        navigate("/teacher/dashboard");
       } else {
         setError(data.message || "Login failed");
         setIsLoading(false);

@@ -1,11 +1,11 @@
 # views.pygfdgfdg
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .models import Announcement
 from .serializers import AnnouncementSerializer
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_date
 from .models import Announcement
@@ -14,7 +14,7 @@ from .serializers import (
     CreateAnnouncementSerializer,
     UpdateAnnouncementSerializer,
 )
-
+from authentication.decorators import IsStudent, IsTeacher
 from authentication.models import User
 
 
@@ -35,16 +35,9 @@ def get_user_from_jwt(request):
 
 
 class AnnouncementAPIView(APIView):
-    """
-    GET    /api/announcements/info/          — list with optional filters
-    POST   /api/announcements/info/          — create
-    PATCH  /api/announcements/info/<pk>/     — partial update
-    DELETE /api/announcements/info/<pk>/     — delete
-    """
 
-    permission_classes = [AllowAny]  # swap with teacher decorator later
+    permission_classes = [IsAuthenticated, IsTeacher] 
 
-    # ── GET ──────────────────────────────────────────────────────────
     def get(self, request, pk=None):
         """
         Query params:
@@ -142,7 +135,7 @@ class TeacherListAPIView(APIView):
     GET /api/announcements/teachers/
     Returns all teachers — used for the created_by filter dropdown.
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsTeacher]
 
     def get(self, request):
         teachers = User.objects.filter(role='teacher').values(
@@ -151,10 +144,9 @@ class TeacherListAPIView(APIView):
         return Response(list(teachers), status=status.HTTP_200_OK)
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated, IsStudent])
 def announcement_list(request):
-    print("=== VIEW HIT ===")
-    print("user:", request.user)
-    print("role:", getattr(request.user, 'role', 'NO ROLE'))
+
     announcements = Announcement.objects.all().order_by('-upload_time')
     serializer = AnnouncementSerializer(announcements, many=True)
     return Response(serializer.data)

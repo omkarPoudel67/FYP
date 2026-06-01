@@ -33,6 +33,8 @@ from .serializers import (
     StudentAttendanceSummarySerializer,
     StudentAttendanceDetailSerializer,
 )
+from authentication.decorators import IsTeacher, IsStudent
+from rest_framework.permissions import IsAuthenticated
 
 
 class ManageAttendanceAPIView(APIView):
@@ -41,8 +43,7 @@ class ManageAttendanceAPIView(APIView):
     Returns all students with their attendance summary.
     Filters: semester, year, group (id), search (name/username)
     """
-    permission_classes = [AllowAny]  # swap with teacher decorator later
-
+    permission_classes = [IsAuthenticated, IsTeacher]  
     def get(self, request):
         queryset = Students.objects.select_related('user', 'group').all()
 
@@ -67,13 +68,44 @@ class ManageAttendanceAPIView(APIView):
         serializer = StudentAttendanceSummarySerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class UpdateAttendanceStatusAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsTeacher]
 
+    def patch(self, request, attendance_id):
+        attendance = get_object_or_404(AttendanceHistory, pk=attendance_id)  # ← AttendanceHistory
+        
+        new_status = request.data.get('status')
+        if not new_status:
+            return Response(
+                {"error": "status field is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        valid_statuses = ['present', 'absent', 'late']
+        if new_status not in valid_statuses:
+            return Response(
+                {"error": f"Invalid status. Must be one of: {valid_statuses}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        attendance.status = new_status
+        attendance.save()
+
+        return Response(
+            {
+                "message": "Attendance status updated successfully.",
+                "attendance_id": attendance.id,
+                "new_status": attendance.status,
+            },
+            status=status.HTTP_200_OK
+        )
+    
 class StudentAttendanceDetailAPIView(APIView):
     """
     GET attendance/info/<student_id>/
     Returns full attendance detail for one student.
     """
-    permission_classes = [AllowAny]  # swap with teacher decorator later
+    permission_classes = [IsAuthenticated, IsTeacher]
 
     def get(self, request, student_id):
         student = get_object_or_404(
@@ -112,6 +144,7 @@ def check_ip(request):
 # Create your views here.
 @api_view(["POST"])
 @csrf_exempt
+@permission_classes([IsAuthenticated, IsStudent])
 def mark_attendance(request):
     model = init_face_model()
     api_key = os.environ.get("PINECONE_API_KEY")
@@ -168,6 +201,7 @@ def mark_attendance(request):
         }, status = 400)
     
 @api_view(['GET'])
+@permission_classes([IsAuthenticated, IsStudent])
 def get_attendance_history(request):
     try:
         student = request.user.students

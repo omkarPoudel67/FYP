@@ -1,10 +1,13 @@
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import "./CSS/ManageTeachers.css";
-
+import { useAuth } from "../../context/authcontext";
 const API_BASE = "http://localhost:8000";
 
 export default function ManageTeachers() {
+  const navigate = useNavigate();
+  const { accessToken } = useAuth();
   const [teachers,    setTeachers]    = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [error,       setError]       = useState(null);
@@ -14,6 +17,10 @@ export default function ManageTeachers() {
   const [editTarget,  setEditTarget]  = useState(null);
   const [saving,      setSaving]      = useState(false);
   const [formError,   setFormError]   = useState(null);
+  const guardRes = (res) => {
+  if (res.status === 403) { navigate("/unauthorized"); return false; }
+  return true;
+};
 
   const [form, setForm] = useState({
     username: "", first_name: "", last_name: "",
@@ -24,14 +31,17 @@ export default function ManageTeachers() {
   const fetchTeachers = async () => {
     setLoading(true); setError(null);
     try {
-      const res  = await fetch(`${API_BASE}/teachers/teachers/`);
+      const res  = await fetch(`${API_BASE}/teachers/teachers/`, {
+        headers: { "Authorization": `Bearer ${accessToken}` }
+      });
+      if (!guardRes(res)) return;
       const data = await res.json();
       setTeachers(data);
     } catch { setError("Failed to load teachers."); }
     finally  { setLoading(false); }
   };
 
-  useEffect(() => { fetchTeachers(); }, []);
+  useEffect(() => { if (!accessToken) return; fetchTeachers(); }, [accessToken]);
 
   // ── filter ────────────────────────────────────────────────────────────────
   const filtered = teachers.filter(t => {
@@ -72,14 +82,15 @@ export default function ManageTeachers() {
   setSaving(true); setFormError(null);
   try {
     const url    = editTarget
-      ? `${API_BASE}/api/teachers/${editTarget.id}/`
-      : `${API_BASE}/api/teachers/`;
+      ? `${API_BASE}/teachers/teachers/${editTarget.id}/`
+      : `${API_BASE}/teachers/teachers/`;
     const method = editTarget ? "PUT" : "POST";
     const res    = await fetch(url, {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" , "Authorization": `Bearer ${accessToken}`,},
       body:    JSON.stringify(form),
     });
+    if (!guardRes(res)) return;
     const data = await res.json();
     if (!res.ok) {
       const first = Object.values(data)[0];
@@ -91,14 +102,19 @@ export default function ManageTeachers() {
   } catch { setFormError("Network error. Please try again."); }
   finally  { setSaving(false); }
 };
-  const handleDelete = async () => {
-    if (!deleteModal) return;
-    try {
-      await fetch(`${API_BASE}/teachers/teachers/${deleteModal.id}/`, { method: "DELETE" });
-      await fetchTeachers();
-    } catch {}
-    setDeleteModal(null);
-  };
+const handleDelete = async () => {
+  if (!deleteModal) return;
+  try {
+    const res = await fetch(`${API_BASE}/teachers/teachers/${deleteModal.id}/`, {
+      method: "DELETE",
+      headers: { "Authorization": `Bearer ${accessToken}` }, // ← missing
+    });
+    if (!guardRes(res)) return; // ← res now exists
+    await fetchTeachers();
+  } catch {}
+  setDeleteModal(null);
+};
+  
 
   const getInitials = (t) => {
     if (t.first_name || t.last_name)

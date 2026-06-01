@@ -8,7 +8,12 @@ from django.contrib.auth import get_user_model
 from facial_recognition.utils import init_face_model, get_face_embedding
 from facial_recognition.pinecone_utils import init_pinecone_index, find_best_match, store_embedding
 from dotenv import load_dotenv
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from authentication.decorators import IsStudent, IsTeacher
+import traceback
+from students.models import Students
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -91,16 +96,18 @@ def face_login(request):
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated, IsStudent])
 def face_register(request):
     try:
         user = request.user  # logged-in student
-        print("Face register request user:", user)
+        
    
         if "image" not in request.FILES:
             return JsonResponse(
                 {"success": False, "message": "No image provided"},
                 status=400
             )
+        
 
         image_file = request.FILES["image"]
 
@@ -125,6 +132,11 @@ def face_register(request):
 
         # Store in Pinecone
         store_embedding(user.id, embedding)
+        print("Face register request user:", user)
+        student = Students.objects.get(user=user)
+        student.has_facial_data = True
+        student.save()
+
 
         return JsonResponse({
             "success": True,
@@ -132,6 +144,9 @@ def face_register(request):
         })
 
     except Exception as e:
+        print("ERROR:", str(e))
+        traceback.print_exc()
+
         return JsonResponse(
             {"success": False, "error": str(e)},
             status=500

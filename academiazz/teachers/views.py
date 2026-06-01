@@ -6,12 +6,14 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from authentication.decorators import IsAuthenticated, IsTeacher
+from rest_framework.decorators import permission_classes
 
 User = get_user_model()
 
 
 class TeacherAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         teachers = Teachers.objects.select_related("user").order_by("user__username")
@@ -27,7 +29,7 @@ class TeacherAPIView(APIView):
 
 
 class TeacherDetailAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
         teacher = get_object_or_404(Teachers, pk=pk)

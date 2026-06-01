@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import "./CSS/ManageAnnouncements.css";
+import { useAuth } from "../../context/authcontext";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = "http://localhost:8000";
 const DESC_LIMIT = 160;
@@ -11,6 +13,8 @@ const emptyForm = {
 };
 
 export default function ManageAnnouncements() {
+  const navigate = useNavigate();
+  const { accessToken } = useAuth();
   const [announcements, setAnnouncements] = useState([]);
   const [teachers, setTeachers]           = useState([]);
   const [loading, setLoading]             = useState(true);
@@ -30,8 +34,12 @@ export default function ManageAnnouncements() {
   const [formErrors, setFormErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast]           = useState(null);
+  const guardRes = (res) => {
+  if (res.status === 403) { navigate("/unauthorized"); return false; }
+    return true;
+  };
 
-  // ── Fetch announcements ─────────────────────────────────────────
+
   const fetchAnnouncements = async () => {
     setLoading(true);
     setError(null);
@@ -42,7 +50,10 @@ export default function ManageAnnouncements() {
       if (filters.start_date) params.append("start_date", filters.start_date);
       if (filters.end_date)   params.append("end_date",   filters.end_date);
 
-      const res  = await fetch(`${API_BASE}/announcements/info/?${params}`);
+      const res  = await fetch(`${API_BASE}/announcements/info/?${params}`, {
+        headers: { "Authorization": `Bearer ${accessToken}` }
+      });
+      if (!guardRes(res)) return;
       const data = await res.json();
       setAnnouncements(data);
     } catch {
@@ -55,7 +66,11 @@ export default function ManageAnnouncements() {
   // ── Fetch teachers for filter dropdown ─────────────────────────
   const fetchTeachers = async () => {
     try {
-      const res  = await fetch(`${API_BASE}/announcements/teachers/`);
+      const res  = await fetch(`${API_BASE}/announcements/teachers/`,
+        { headers: { "Authorization": `Bearer ${accessToken}` } }
+      );
+      if (!guardRes(res)) return;
+      
       const data = await res.json();
       setTeachers(data);
     } catch {
@@ -63,8 +78,8 @@ export default function ManageAnnouncements() {
     }
   };
 
-  useEffect(() => { fetchTeachers(); }, []);
-  useEffect(() => { fetchAnnouncements(); }, [filters]);
+  useEffect(() => { if (!accessToken) return; fetchTeachers(); }, [accessToken]);
+  useEffect(() => { if (!accessToken) return; fetchAnnouncements(); }, [filters, accessToken]);
 
   // ── Toast ───────────────────────────────────────────────────────
   const showToast = (message, type = "success") => {
@@ -114,9 +129,10 @@ export default function ManageAnnouncements() {
     try {
       const res  = await fetch(`${API_BASE}/announcements/info/`, {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
         body:    JSON.stringify(form),
       });
+      if (!guardRes(res)) return;
       const data = await res.json();
       if (res.ok) {
         showToast(data.message || "Announcement created.");
@@ -138,9 +154,10 @@ export default function ManageAnnouncements() {
     try {
       const res  = await fetch(`${API_BASE}/announcements/info/${selected.id}/`, {
         method:  "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" ,"Authorization": `Bearer ${accessToken}` },
         body:    JSON.stringify(form),
       });
+      if (!guardRes(res)) return;
       const data = await res.json();
       if (res.ok) {
         showToast("Announcement updated successfully.");
@@ -162,7 +179,9 @@ export default function ManageAnnouncements() {
     try {
       const res = await fetch(`${API_BASE}/announcements/info/${selected.id}/`, {
         method: "DELETE",
+        headers: { "Authorization": `Bearer ${accessToken}` }
       });
+      if (!guardRes(res)) return;
       if (res.ok) {
         showToast("Announcement deleted.");
         closeModal();

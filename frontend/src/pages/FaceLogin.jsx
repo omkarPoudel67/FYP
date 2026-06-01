@@ -77,7 +77,7 @@ export default function FaceLogin() {
         setAccessToken(data.access);
 
         if (data.role === "student") {
-          navigate("/student-dashboard");
+          navigate("/");
         } else if (data.role === "teacher") {
           navigate("/teacher-dashboard");
         } else {

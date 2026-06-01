@@ -20,6 +20,11 @@ from students.models import Students
 from announcements.models import Announcement
 from resources.models import Module
 
+def truncate_text(text: str, max_chars: int = 1500) -> str:
+    if len(text) <= max_chars:
+        return text
+    return text[:max_chars] + "... [truncated]"
+
 SYSTEM_PROMPT = """You are a helpful academic assistant for a student at Academiazz.
 You have access to the student's complete academic information through a set of tools.
 
@@ -41,9 +46,21 @@ When answering:
 - If attendance is below 75% warn the student
 - Always mention the source e.g "According to your attendance record..."
 
+Important — how to handle resource content:
+- The summary you receive from get_class_resources is made of short extracted sentences, one per chunk of the document
+- These sentences are not connected — they are independently pulled from different parts of the material
+- Do NOT read them as a flowing paragraph — treat each bullet point as a separate topic hint
+- When answering, synthesize and group related points together into a coherent response
+- Never repeat the bullet points word for word — always rewrite in your own words
+- If the content seems incomplete or disconnected, acknowledge it and offer what you can
+- Never fabricate content that is not present in the bullets
+When sharing download links, present them as plain text like:
+Download: https://yourdomain.com/resources/download/42/
+Never wrap links in HTML tags like <a href>.
 Today's date is: {today}
 The student you are helping is: {student_name}
 """
+
 _llm = None
 
 def get_llm():
@@ -311,6 +328,14 @@ class StudentTools:
             Use question to pass the student's exact question.
             Set specific=True if student is asking about a particular topic within the material.
             Set specific=False if student just wants a general summary of what was covered.
+
+            IMPORTANT — understanding the returned content:
+            The summary returned is a collection of short sentences extracted from different
+            chunks of the document. They are NOT a flowing text — each sentence represents
+            a different section of the material. Treat them as topic hints, synthesize them
+            into a coherent answer, and never repeat them verbatim to the student.
+            If specific=True, the chunk content returned is raw extracted text — use it
+            carefully, focus on what is relevant to the student's question and ignore noise.
             """
 
             # Query the database
@@ -338,6 +363,7 @@ class StudentTools:
 
 
                 content = chunk_content if specific else overall_summary
+                content = truncate_text(content, max_chars=1500)
 
                 results.append(
                     f"Title: {metadata.get('title', resource.title)}\n"

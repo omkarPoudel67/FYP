@@ -1,11 +1,30 @@
 from rest_framework import serializers
 from .models import Resource, Module
 import os
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 
 class ModuleCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
         fields = ['id', 'name', 'code', 'year', 'semester']
+    def validate(self, attrs):
+        # build a temp instance to run full_clean
+        if self.instance:
+            # update — apply attrs on top of existing instance
+            temp = self.instance
+            for attr, value in attrs.items():
+                setattr(temp, attr, value)
+        else:
+            # create — build fresh
+            temp = Module(**attrs)
+
+        try:
+            temp.full_clean(exclude=['name', 'code'])  # exclude unique fields — already checked by validate_name/validate_code
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(e.message_dict)
+
+        return attrs
 
     def validate_name(self, value):
         qs = Module.objects.filter(name__iexact=value)

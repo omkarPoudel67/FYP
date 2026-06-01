@@ -26,7 +26,7 @@ admin.site.index_title = "Welcome to Teachers Administration"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/', include('authentication.urls')),
+    # path('auth/', include('authentication.urls')),
     path('api/', include('authentication.api_urls')), 
     path("api/facial-recognition/", include("facial_recognition.urls")),
     path('api/students/', include('students.urls')),

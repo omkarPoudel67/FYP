@@ -1,8 +1,8 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // adjust path as needed
+import { useAuth } from "../context/authContext"; // adjust path as needed
 
 export default function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
+  const { accessToken, loading } = useAuth();
 
   if (loading) {
     return (
@@ -12,7 +12,8 @@ export default function ProtectedRoute({ children }) {
     );
   }
 
-  if (!isAuthenticated) {
+
+  if (!accessToken) {
     return <Navigate to="/unauthorized" replace />;
   }
 

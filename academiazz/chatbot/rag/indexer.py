@@ -59,61 +59,44 @@ def get_index_path(resource) -> str:
 
 # ── Summarize a single chunk ───────────────────────────────────────────────
 def summarize_chunk(chunk_text: str) -> str:
-    llm = get_llm()
-    prompt = f"""Summarize the following lecture content in 2-3 clear sentences.
-Focus on the key concepts and topics covered.
-Do not add any introduction like 'This chunk discusses...' just give the summary directly.
-
-Content:
-{chunk_text}"""
-
-    response = llm.invoke([HumanMessage(content=prompt)])
-    return response.content.strip()
+    """
+    Extract first 1-2 sentences from chunk as its summary.
+    No LLM involved.
+    """
+    sentences = chunk_text.strip().split(". ")
+    summary = ". ".join(sentences[:2]).strip()
+    if summary and not summary.endswith("."):
+        summary += "."
+    return summary
 
 
 
 def summarize_resource(chunk_summaries: list[str]) -> str:
     """
-    Takes all chunk summaries and combines them into
-    one overall summary of the entire PDF.
-    This is what the chatbot uses when student asks
-    'what did we learn in week 3?'
+    Joins all chunk summaries with bullet points.
+    No LLM involved.
     """
-    llm = get_llm()
-    combined = "\n\n".join(chunk_summaries)
-
-    prompt = f"""Below are summaries of different sections of a lecture/tutorial/workshop PDF.
-Combine them into one clear, well structured overall summary of what was covered.
-Write it as if you are explaining to a student what they learned in this session.
-Keep it under 200 words.
-
-Section Summaries:
-{combined}"""
-
-    response = llm.invoke([HumanMessage(content=prompt)])
-    return response.content.strip()
-
+    lines = [f"• {s}" for s in chunk_summaries if s.strip()]
+    return "\n".join(lines)
 
 
 def index_resource(resource):
-
     pdf_path = os.path.join(settings.MEDIA_ROOT, str(resource.file))
-    
 
     if not os.path.exists(pdf_path):
         print(f"PDF not found: {pdf_path}")
         return
 
     loader = get_loader(pdf_path)
-    pages = loader.load()
+    pages  = loader.load()
 
     if not pages:
         print(f"Could not extract content from: {pdf_path}")
         return
 
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50
+        chunk_size    = 200,   # tokens approx
+        chunk_overlap = 20
     )
     chunks = splitter.split_documents(pages)
 
@@ -123,11 +106,8 @@ def index_resource(resource):
 
     download_url = f"{settings.MEDIA_URL}{resource.file}"
 
-    print(f"Summarizing {len(chunks)} chunks for resource {resource.id}...")
     chunk_summaries = []
-
     for i, chunk in enumerate(chunks):
-        print(f"  Summarizing chunk {i+1}/{len(chunks)}...")
         chunk_summary = summarize_chunk(chunk.page_content)
         chunk_summaries.append(chunk_summary)
 
@@ -139,23 +119,19 @@ def index_resource(resource):
             "week"          : resource.week,
             "type"          : resource.type,
             "download_url"  : download_url,
-            "chunk_summary" : chunk_summary,  
+            "chunk_summary" : chunk_summary,
         })
 
-    print(f"Building overall summary for resource {resource.id}...")
     overall_summary = summarize_resource(chunk_summaries)
 
-    
     for chunk in chunks:
         chunk.metadata["overall_summary"] = overall_summary
 
-   
     vectorstore = FAISS.from_documents(chunks, getembeddings())
-
 
     index_path = get_index_path(resource)
     vectorstore.save_local(index_path)
-    print(f"Index saved for resource {resource.id} — {len(chunks)} chunks indexed")
+    print(f"Index saved for resource {resource.id} — {len(chunks)} chunks indexed, no LLM used")
 
 
 def query_resource(resource, question: str, k: int = 4) -> dict:

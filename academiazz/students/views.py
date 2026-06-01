@@ -22,7 +22,7 @@ from django.db.models import Q
 
 
 @api_view(["POST"])
-@permission_classes([IsStudent])
+@permission_classes([IsAuthenticated, IsStudent])
 def get_student_data(request):
     if request.method == 'POST':
         student = Students.objects.get(user=request.user)
@@ -40,7 +40,7 @@ class StudentAPIView(APIView):
     DELETE /api/students/<pk>/    — delete student + user
     """
 
-    permission_classes = [AllowAny]  # swap with teacher decorator later
+    permission_classes = [IsAuthenticated, IsTeacher]  # swap with teacher decorator later
 
     # ------------------------------------------------------------------
     # GET

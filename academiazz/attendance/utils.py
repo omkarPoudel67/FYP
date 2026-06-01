@@ -44,5 +44,3 @@ def get_current_running_class(group_id):
 
 
 
-#
-# print(get_current_running_class(99))

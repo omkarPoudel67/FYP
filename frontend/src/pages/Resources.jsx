@@ -10,11 +10,7 @@ const Resources = () => {
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedWeek, setSelectedWeek] = useState(null);
 
-  const {
-    modules,
-    loading: modulesLoading,
-    error: modulesError,
-  } = useModules(studentData?.group?.id || studentData?.group);
+  const { modules, loading: modulesLoading, error: modulesError } = useModules(studentData?.group?.id);
 
   const {
     weeks,

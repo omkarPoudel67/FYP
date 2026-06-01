@@ -51,7 +51,7 @@ const Unauthorized401 = () => {
         <h2 style={styles.title}>Unauthorized</h2>
         <p style={styles.message}>You do not have permission to access this page.</p>
         <a
-          href="/"
+          href="/login"
           style={{ ...styles.button }}
           onMouseOver={(e) => (e.target.style.backgroundColor = "#c0392b")}
           onMouseOut={(e) => (e.target.style.backgroundColor = "#e74c3c")}

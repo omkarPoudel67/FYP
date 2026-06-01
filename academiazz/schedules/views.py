@@ -1,16 +1,20 @@
 # students/views.py
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+
+from authentication.decorators import IsTeacher, IsStudent
 from .models import Schedule, Group
 from .serializers import ScheduleSerializer, GroupSerializer, ScheduleCreateUpdateSerializer, GroupCreateUpdateSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
+from authentication.decorators import IsAuthenticated
+
 
 class GroupDetailAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsTeacher]
 
     def put(self, request, pk):
         group = get_object_or_404(Group, pk=pk)
@@ -28,7 +32,7 @@ class GroupDetailAPIView(APIView):
 
 # ADD this new class for schedule create/list
 class ScheduleAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsTeacher]  # Only teachers can manage schedules
 
     def get(self, request):
         # same logic as your existing get_schedules, just class-based
@@ -64,7 +68,7 @@ class ScheduleAPIView(APIView):
 
 # ADD this new class for schedule update/delete
 class ScheduleDetailAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsTeacher]
 
     def put(self, request, pk):
         schedule = get_object_or_404(Schedule, pk=pk)
@@ -80,7 +84,7 @@ class ScheduleDetailAPIView(APIView):
         return Response({"detail": "Schedule deleted."}, status=status.HTTP_204_NO_CONTENT)
 
 class GroupAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsTeacher]
 
     def get(self, request):
         # your existing get — unchanged
@@ -96,6 +100,7 @@ class GroupAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated, IsStudent])  
 def get_schedules(request):
     group_id = request.query_params.get("group")
 

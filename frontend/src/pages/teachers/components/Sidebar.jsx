@@ -4,23 +4,28 @@ import { useAuth } from "../../../context/authcontext";
 import "../CSS/Sidebar.css";
 
 const NAV_ITEMS = [
-  {
-    to: "/teacher/dashboard",
-    label: "Dashboard",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <rect x="3" y="3" width="7" height="7" rx="1" />
-        <rect x="14" y="3" width="7" height="7" rx="1" />
-        <rect x="3" y="14" width="7" height="7" rx="1" />
-        <rect x="14" y="14" width="7" height="7" rx="1" />
-      </svg>
-    ),
-  },
+  // {
+  //   to: "/teacher/dashboard",
+  //   label: "Dashboard",
+  //   icon: (
+  //     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+  //       <rect x="3" y="3" width="7" height="7" rx="1" />
+  //       <rect x="14" y="3" width="7" height="7" rx="1" />
+  //       <rect x="3" y="14" width="7" height="7" rx="1" />
+  //       <rect x="14" y="14" width="7" height="7" rx="1" />
+  //     </svg>
+  //   ),
+  // },
   {
     to: "/teacher/students",
     label: "Students",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -33,7 +38,12 @@ const NAV_ITEMS = [
     label: "Attendance",
     activeOn: ["/teacher/attendance"],
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
         <path d="M9 11l3 3L22 4" />
         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
       </svg>
@@ -43,7 +53,12 @@ const NAV_ITEMS = [
     to: "/teacher/announcements",
     label: "Announcements",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
         <path d="M13.73 21a2 2 0 0 1-3.46 0" />
       </svg>
@@ -54,7 +69,12 @@ const NAV_ITEMS = [
     label: "Schedules",
     activeOn: ["/teacher/schedules", "/teacher/groups/"],
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
         <rect x="3" y="4" width="18" height="18" rx="2" />
         <line x1="16" y1="2" x2="16" y2="6" />
         <line x1="8" y1="2" x2="8" y2="6" />
@@ -66,9 +86,14 @@ const NAV_ITEMS = [
     to: "/teacher/resources",
     label: "Resources",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <path d="M14 2v6h6"/>
+        <path d="M14 2v6h6" />
         <line x1="16" y1="13" x2="8" y2="13" />
         <line x1="16" y1="17" x2="8" y2="17" />
       </svg>
@@ -78,7 +103,12 @@ const NAV_ITEMS = [
     to: "/teacher/modules",
     label: "Modules",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
         <rect x="3" y="3" width="18" height="7" rx="1" />
         <rect x="3" y="14" width="18" height="7" rx="1" />
       </svg>
@@ -89,7 +119,12 @@ const NAV_ITEMS = [
     label: "Groups",
     end: true,
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -101,7 +136,12 @@ const NAV_ITEMS = [
     to: "/teacher/teachers",
     label: "Teachers",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
         <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
         <path d="M12 12v.01" />
         <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -111,11 +151,11 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar() {
-  const [collapsed,      setCollapsed]      = useState(false);
-  const [confirmLogout,  setConfirmLogout]  = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [confirmLogout, setConfirmLogout] = useState(false);
   const { setAccessToken } = useAuth();
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -130,14 +170,13 @@ export default function Sidebar() {
 
   const isItemActive = (item) => {
     const path = location.pathname;
-    if (item.activeOn) return item.activeOn.some(p => path.startsWith(p));
-    if (item.end)      return path === item.to;
+    if (item.activeOn) return item.activeOn.some((p) => path.startsWith(p));
+    if (item.end) return path === item.to;
     return path.startsWith(item.to);
   };
 
   return (
     <aside className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`}>
-
       {/* Header */}
       <div className="sidebar__header">
         <div className="sidebar__brand">
@@ -146,21 +185,27 @@ export default function Sidebar() {
         </div>
         <button
           className="sidebar__toggle"
-          onClick={() => setCollapsed(c => !c)}
+          onClick={() => setCollapsed((c) => !c)}
           aria-label="Toggle sidebar"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            {collapsed
-              ? <path d="M9 18l6-6-6-6" />
-              : <path d="M15 18l-6-6 6-6" />
-            }
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+          >
+            {collapsed ? (
+              <path d="M9 18l6-6-6-6" />
+            ) : (
+              <path d="M15 18l-6-6 6-6" />
+            )}
           </svg>
         </button>
       </div>
 
       {/* Nav */}
       <nav className="sidebar__nav">
-        {NAV_ITEMS.map(item => {
+        {NAV_ITEMS.map((item) => {
           const active = isItemActive(item);
           return (
             <NavLink
@@ -170,7 +215,9 @@ export default function Sidebar() {
               className={`sidebar__link ${active ? "sidebar__link--active" : ""}`}
             >
               <span className="sidebar__icon">{item.icon}</span>
-              {!collapsed && <span className="sidebar__label">{item.label}</span>}
+              {!collapsed && (
+                <span className="sidebar__label">{item.label}</span>
+              )}
             </NavLink>
           );
         })}
@@ -179,17 +226,22 @@ export default function Sidebar() {
       {/* Footer */}
       <div className="sidebar__footer">
         {confirmLogout ? (
-          <div className={`sidebar__confirm ${collapsed ? "sidebar__confirm--collapsed" : ""}`}>
-            {!collapsed && (
-              <span className="sidebar__confirm-text">Sure?</span>
-            )}
+          <div
+            className={`sidebar__confirm ${collapsed ? "sidebar__confirm--collapsed" : ""}`}
+          >
+            {!collapsed && <span className="sidebar__confirm-text">Sure?</span>}
             <button
               className="sidebar__confirm-yes"
               onClick={handleLogout}
               title="Yes, logout"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M20 6L9 17l-5-5"/>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path d="M20 6L9 17l-5-5" />
               </svg>
             </button>
             <button
@@ -197,9 +249,14 @@ export default function Sidebar() {
               onClick={() => setConfirmLogout(false)}
               title="Cancel"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
           </div>
@@ -209,9 +266,14 @@ export default function Sidebar() {
             onClick={() => setConfirmLogout(true)}
           >
             <span className="sidebar__icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <path d="M16 17l5-5-5-5"/>
+                <path d="M16 17l5-5-5-5" />
                 <line x1="21" y1="12" x2="9" y2="12" />
               </svg>
             </span>
@@ -219,7 +281,6 @@ export default function Sidebar() {
           </button>
         )}
       </div>
-
     </aside>
   );
 }

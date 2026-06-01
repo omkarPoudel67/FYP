@@ -1,11 +1,32 @@
 from rest_framework import serializers
 from .models import Group, Schedule
 from resources.models import Module
+from teachers.models import Teachers
+
 
 class GroupSerializer(serializers.ModelSerializer):
+    modules = serializers.SerializerMethodField()
+    students = serializers.SerializerMethodField()
+    student_count = serializers.IntegerField(source="students.count", read_only=True)
+
     class Meta:
         model = Group
-        fields = "__all__"
+        fields = ["id", "name", "module", "modules", "students", "student_count"]
+
+    def get_modules(self, obj):
+        return [{"id": m.id, "name": m.name, "code": m.code} for m in obj.module.all()]
+
+    def get_students(self, obj):
+        return [
+            {
+                "id": s.pk,
+                "full_name": f"{s.user.first_name} {s.user.last_name}".strip(),
+                "username": s.user.username,
+                "year": s.year,
+                "semester": s.semester,
+            }
+            for s in obj.students.select_related("user").all()
+        ]
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -25,6 +46,24 @@ class GroupCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ["id", "name", "module"]
+    
+    def validate_module(self, value):
+    # Rule 1: max 6 modules
+        if len(value) > 6:
+            raise serializers.ValidationError(
+                "A group can have a maximum of 6 modules."
+            )
+
+        # Rule 2: semester consistency rule
+        semesters = sorted([m.semester for m in value])
+
+        # OPTION A (STRICT): all modules must be same semester
+        if len(set(semesters)) > 1:
+            raise serializers.ValidationError(
+                "All modules in a group must belong to the same semester."
+            )
+
+        return value
 
     def validate_name(self, value):
         qs = Group.objects.filter(name__iexact=value)
@@ -50,6 +89,11 @@ class GroupCreateUpdateSerializer(serializers.ModelSerializer):
 
     
 class ScheduleCreateUpdateSerializer(serializers.ModelSerializer):
+    teacher = serializers.PrimaryKeyRelatedField(
+        queryset=Teachers.objects.all(),
+        required=False,
+        allow_null=True,
+    )
     class Meta:
         model = Schedule
         fields = [

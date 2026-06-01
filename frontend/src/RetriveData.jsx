@@ -2,6 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./context/authcontext";
 
+const handle403 = (err, navigate) => {
+  if (err.response?.status === 403) {
+    navigate("/unauthorized");
+    return true;
+  }
+  return false;
+};
+
 export default function useStudentData() {
   const { accessToken, api } = useAuth();
   const navigate = useNavigate();
@@ -32,6 +40,7 @@ export default function useStudentData() {
         setStudentData(res.data);
         console.log(studentData);
       } catch (err) {
+        navigate("/unauthorized")
         console.error("Failed to fetch student data", err);
         setError("Unauthorized");
       } finally {
@@ -67,6 +76,7 @@ export function useModules(groupId) {
         setModules(res.data);
         console.log(res.data)
       } catch (err) {
+        navigate("/unauthorized")
         console.error("Failed to fetch modules:", err);
         setError("Failed to load modules");
       } finally {
@@ -107,6 +117,7 @@ export function useWeeks(moduleName) {
         setWeeks(res.data.weeks || []);
         console.log("Weeks data:", res.data);
       } catch (err) {
+        navigate("/unauthorized")
         console.error("Failed to fetch weeks:", err);
         setError("Failed to load weeks");
       } finally {
@@ -146,6 +157,7 @@ export function useResources(moduleName, week) {
         setResources(res.data);
         console.log("Resources:", res.data);
       } catch (err) {
+        navigate("/unauthorized")
         console.error("Failed to fetch resources:", err);
         if (err.response?.status === 404) {
           setError("No resources found for this module and week");
@@ -186,6 +198,7 @@ export function useSchedules(groupId) {
         setSchedules(res.data);
         console.log("Schedules fetched:", res.data);
       } catch (err) {
+        navigate("/unauthorized")
         console.error("Failed to fetch schedules:", err);
         setError("Failed to load schedules");
       } finally {
@@ -221,6 +234,7 @@ export function useAnnouncements() {
         setAnnouncements(res.data);
         console.log("Announcements fetched:", res.data);
       } catch (err) {
+        navigate("/unauthorized")
         console.error("Failed to fetch announcements:", err);
         setError("Failed to load announcements");
       } finally {
@@ -256,6 +270,7 @@ export function useAttendanceHistory() {
         setAttendance(res.data);
         console.log("Attendance fetched:", res.data);
       } catch (err) {
+        navigate("/unauthorized")
         console.error("Failed to fetch attendance history:", err);
         setError("Failed to load attendance history");
       } finally {

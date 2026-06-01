@@ -1,7 +1,16 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "./context/authcontext";
 
 const AuthGate = ({ children }) => {
-  const { loading } = useAuth();
+  const { loading, accessToken } = useAuth();
+  const navigate = useNavigate();  
+
+  useEffect(() => {
+    if (!loading && !accessToken) {
+      navigate("/login"); 
+    }
+  }, [loading, accessToken]);
 
   if (loading) {
     return (

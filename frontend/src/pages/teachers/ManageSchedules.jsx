@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import "./CSS/ManageSchedules.css";
+import { useAuth } from "../../context/authcontext";
 
 const API_BASE  = "http://localhost:8000";
 const SEMESTERS = [1, 2, 3, 4, 5, 6];
@@ -9,23 +10,32 @@ const YEARS     = [1, 2, 3];
 
 export default function ManageSchedules() {
   const navigate = useNavigate();
+  const { accessToken } = useAuth();
+    const guardRes = (res) => {
+  if (res.status === 403) { navigate("/unauthorized"); return false; }
+  return true;
+};
 
   const [groups,  setGroups]  = useState([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
   const [filters, setFilters] = useState({ year: "", semester: "", search: "" });
 
+
   const fetchGroups = async () => {
     setLoading(true); setError(null);
     try {
-      const res  = await fetch(`${API_BASE}/schedule/groups/`);
+      const res  = await fetch(`${API_BASE}/schedule/groups/`, {
+        headers: { "Authorization": `Bearer ${accessToken}` }
+      });
       const data = await res.json();
       setGroups(data);
+      if (!guardRes(res)) return;
     } catch { setError("Failed to load groups."); }
     finally  { setLoading(false); }
   };
 
-  useEffect(() => { fetchGroups(); }, []);
+  useEffect(() => { if (!accessToken) return; fetchGroups(); }, [accessToken]);
 
   // derive year/semester from first student in group
   const getGroupMeta = g => {
